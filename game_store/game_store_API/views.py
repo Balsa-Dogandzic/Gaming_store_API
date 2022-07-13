@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .serializers import RegisterSerializer, UserSerializer, CustomTokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.views import TokenObtainPairView
-from django.contrib.auth.models import User
+from .models import User
 from rest_framework import viewsets
 from rest_framework import permissions
 
@@ -48,9 +48,6 @@ class Profile(TokenObtainPairView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = User.objects.all().order_by('username')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]

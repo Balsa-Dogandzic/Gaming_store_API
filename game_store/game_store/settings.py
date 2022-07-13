@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'game_store_API',
 ]
 
+AUTH_USER_MODEL = 'game_store_API.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
