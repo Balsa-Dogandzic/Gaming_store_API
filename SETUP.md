@@ -12,8 +12,9 @@ Instalirajte requirements.txt:
 
 `pip install -r requirements.txt`
 
-Izvrsite migracije pomocu manage.py(fajl manage.py se nalazi u game_store direktorijumu):
+Napravite, pa izvrsite migracije pomocu manage.py(fajl manage.py se nalazi u game_store direktorijumu):
 
+`python manage.py makemigrations`
 `python manage.py migrate` 
 
 Pokrenite server:
