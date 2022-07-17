@@ -1,11 +1,9 @@
-from rest_framework import status,generics
+from rest_framework import status,generics, permissions, viewsets, views
 from rest_framework.response import Response
 from .serializers import RegisterSerializer, UserSerializer, CustomTokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import User
-from rest_framework import viewsets
-from rest_framework import permissions
 
 
 
@@ -48,6 +46,21 @@ class Profile(TokenObtainPairView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by('username')
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class UserDetails(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            return User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
