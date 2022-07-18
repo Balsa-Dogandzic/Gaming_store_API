@@ -4,7 +4,6 @@ from game_store.settings import SIMPLE_JWT
 from .models import User
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.conf import settings
 from django.contrib.auth.models import update_last_login
 
 
