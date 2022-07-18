@@ -1,13 +1,11 @@
 from rest_framework import status,generics, permissions, viewsets, views
 from rest_framework.response import Response
-from .serializers import RegisterSerializer, UserSerializer, CustomTokenObtainPairSerializer
+from .serializers import RegisterSerializer, TokenObtainPairSerializer, UserSerializer
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase
 from .models import User
 
 
-
-#Register API
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
     def post(self, request, *args,  **kwargs):
@@ -18,31 +16,6 @@ class RegisterView(generics.GenericAPIView):
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "message": "User Created Successfully.",
         })
-
-
-class Profile(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
-
-    def post(self, request, *args, **kwargs):
-        username = request.data.get('username', '')
-        password = request.data.get('password', '')
-        user = authenticate(
-            username=username,
-            password=password
-        )
-
-        if user:
-            login_serializer = self.serializer_class(data=request.data)
-            if login_serializer.is_valid():
-                user_serializer = UserSerializer(user)
-                return Response({
-                    #'token': login_serializer.validated_data.get('access'),
-                    #'refresh-token': login_serializer.validated_data.get('refresh'),
-                    'user': user_serializer.data,
-                    #'message': 'Successful login'
-                }, status=status.HTTP_200_OK)
-            return Response({'error': 'Bad request'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'error': 'Bad request'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -64,3 +37,7 @@ class UserDetails(views.APIView):
         user = self.get_object(pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
+class TokenObtainPairView(TokenViewBase):
+    serializer_class = TokenObtainPairSerializer
