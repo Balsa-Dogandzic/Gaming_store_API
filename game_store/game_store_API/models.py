@@ -47,7 +47,7 @@ class User(AbstractUser):
     )
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
     balance = models.DecimalField(max_digits=11, decimal_places=2, default=1000)
