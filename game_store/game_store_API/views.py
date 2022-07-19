@@ -1,9 +1,11 @@
-from rest_framework import status,generics, permissions, viewsets, views
+from django.http import JsonResponse
+from rest_framework import status,generics, permissions, views
 from rest_framework.response import Response
 from .serializers import RegisterSerializer, TokenObtainPairSerializer, UserSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.views import TokenViewBase
 from .models import User
+from rest_framework.views import APIView
 
 
 class RegisterView(generics.GenericAPIView):
@@ -24,10 +26,16 @@ class RegisterView(generics.GenericAPIView):
             })
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by('id')
+class InactiveUsersSet(APIView):
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, format=None):
+        inactive_users = User.objects.filter(is_active=False).order_by('id')
+        serializer = UserSerializer(inactive_users,many=True)
+        return Response({
+            "status": status.HTTP_200_OK,
+            "massage":"List of all inactive users",
+            "data":serializer.data
+        })
 
 
 class UserDetails(views.APIView):
