@@ -16,7 +16,11 @@ Napravite, pa izvrsite migracije pomocu manage.py(fajl manage.py se nalazi u gam
 
 `python manage.py makemigrations`
 
-`python manage.py migrate` 
+`python manage.py migrate`
+
+Ubacite podatke iz dump.json fajla u bazu podataka pomocu komande:
+
+`python game_store/manage.py loaddata dump.json`
 
 Pokrenite server:
 

@@ -1,11 +1,12 @@
 from django.http import JsonResponse
-from rest_framework import status,generics, permissions, views
+from rest_framework import status,generics, views
 from rest_framework.response import Response
 from .serializers import RegisterSerializer, TokenObtainPairSerializer, UserSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.views import TokenViewBase
 from .models import User
-from rest_framework.views import APIView
+from .permissions import UserIsAdmin
+
 
 
 class RegisterView(generics.GenericAPIView):
@@ -26,7 +27,9 @@ class RegisterView(generics.GenericAPIView):
             })
 
 
-class InactiveUsersSet(APIView):
+class InactiveUsersSet(views.APIView):
+    permission_classes = [UserIsAdmin,]
+
     serializer_class = UserSerializer
     def get(self, request, format=None):
         inactive_users = User.objects.filter(is_active=False).order_by('id')
@@ -39,7 +42,7 @@ class InactiveUsersSet(APIView):
 
 
 class UserDetails(views.APIView):
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [UserIsAdmin,]
 
     def get_object(self, pk):
         try:

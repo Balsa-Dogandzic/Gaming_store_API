@@ -23,7 +23,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id','username','email','password','first_name','last_name','is_active','staff','admin','is_superuser','date_joined','last_login']
+        fields = ['id','username','email','password','first_name','last_name','is_active','admin','date_joined','last_login']
 
 
 class TokenObtainPairSerializer(TokenObtainSerializer):
