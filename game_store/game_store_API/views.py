@@ -22,7 +22,7 @@ class RegisterView(generics.GenericAPIView):
         else:
             return Response({
                 "status": status.HTTP_400_BAD_REQUEST,
-                "massage": "User with the same username or email already exists."
+                "message": "User with the same username or email already exists."
             })
 
 
@@ -33,24 +33,41 @@ class InactiveUsersSet(APIView):
         serializer = UserSerializer(inactive_users,many=True)
         return Response({
             "status": status.HTTP_200_OK,
-            "massage":"List of all inactive users",
+            "message":"List of all inactive users",
             "data":serializer.data
         })
 
 
 class UserDetails(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self, pk):
         try:
-            return User.objects.get(pk=pk)
+            user = User.objects.get(pk=pk)
+            return user
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request, pk, format=None):
         user = self.get_object(pk)
         serializer = UserSerializer(user)
-        return Response(serializer.data)
+        return JsonResponse(serializer.data)
+    def put(self, request, pk, format=None):
+        user = self.get_object(pk=pk)
+        data=request.data
+        try:
+            user.is_active = data["is_active"]
+            user.save()
+            return JsonResponse({
+                'status': status.HTTP_201_CREATED,
+                'message': 'User approved succesfully'
+            })
+        except:
+            return JsonResponse({
+                'status': status.HTTP_400_BAD_REQUEST,
+                'message': 'User not approved'
+                })
+
 
 
 class TokenObtainPairView(TokenViewBase):
