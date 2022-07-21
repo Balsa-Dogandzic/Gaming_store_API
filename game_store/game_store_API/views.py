@@ -17,14 +17,16 @@ class RegisterView(generics.GenericAPIView):
             user = serializer.save()
             return Response({
                 "status": status.HTTP_201_CREATED,
+                "success": True,
                 "message": "User Created Successfully.",
                 "data": UserSerializer(user, context=self.get_serializer_context()).data,
-            })
+            },status = status.HTTP_201_CREATED)
         else:
             return Response({
                 "status": status.HTTP_400_BAD_REQUEST,
+                'success': False,
                 "message": "User with the same username or email already exists."
-            })
+            },status = status.HTTP_400_BAD_REQUEST)
 
 
 class InactiveUsersSet(views.APIView):
@@ -36,9 +38,10 @@ class InactiveUsersSet(views.APIView):
         serializer = UserSerializer(inactive_users,many=True)
         return Response({
             "status": status.HTTP_200_OK,
-            "message":"List of all inactive users",
-            "data":serializer.data
-        })
+            "success": True,
+            "message": "List of all inactive users",
+            "data": serializer.data
+        },status = status.HTTP_200_OK)
 
 
 class UserDetails(views.APIView):
@@ -49,7 +52,11 @@ class UserDetails(views.APIView):
             user = User.objects.get(pk=pk)
             return user
         except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                "status": status.HTTP_404_NOT_FOUND,
+                "success": False,
+                "message": "User not found."
+            },status = status.HTTP_404_NOT_FOUND)
 
     def get(self, request, pk, format=None):
         user = self.get_object(pk)
@@ -61,15 +68,17 @@ class UserDetails(views.APIView):
         try:
             user.is_active = data["is_active"]
             user.save()
-            return JsonResponse({
-                'status': status.HTTP_201_CREATED,
+            return Response({
+                "status": status.HTTP_201_CREATED,
+                'success': True,
                 'message': 'User approved succesfully'
-            })
+            },status = status.HTTP_201_CREATED)
         except:
-            return JsonResponse({
-                'status': status.HTTP_400_BAD_REQUEST,
+            return Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                'success': False,
                 'message': 'User not approved'
-                })
+                },status = status.HTTP_400_BAD_REQUEST)
 
 
 
