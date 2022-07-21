@@ -20,7 +20,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','url','username','email','password','first_name','last_name','is_active','admin','date_joined','last_login']
+
+
+class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id','username','email','password','first_name','last_name','is_active','admin','date_joined','last_login']
@@ -43,7 +49,7 @@ class TokenObtainPairSerializer(TokenObtainSerializer):
         data['access'] = str(refresh.access_token)
         my_user = User.objects.filter(pk=self.user.id).first()
         if my_user:
-            serializer = UserSerializer(my_user)
+            serializer = LoginSerializer(my_user)
             data['user'] = serializer.data
 
         if SIMPLE_JWT.get('UPDATE_LAST_LOGIN'):

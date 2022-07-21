@@ -15,7 +15,7 @@ class NotAdmin(APIException):
 
 class UserIsAdmin(permissions.BasePermission):
 
-    allowed = ("GET","POST","PUT","DELETE")
+    allowed = ("GET","PUT","DELETE")
 
     def has_permission(self, request, view):
         if request.user.is_authenticated and request.user.admin:

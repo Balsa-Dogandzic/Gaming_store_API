@@ -49,7 +49,7 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
-    balance = models.DecimalField(max_digits=11, decimal_places=2, default=1000,validators=[MaxValueValidator(1000),MinValueValidator(0)])
+    balance = models.DecimalField(max_digits=6, decimal_places=2, default=1000,validators=[MaxValueValidator(1000),MinValueValidator(0)])
     objects: MyUserManager()
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
@@ -89,6 +89,7 @@ class Product(models.Model):
     name = models.CharField(max_length=32)
     image = models.FileField(upload_to='products/')
     description = models.TextField()
+    price = models.DecimalField(max_digits=6,decimal_places=2,validators=[MaxValueValidator(1000),MinValueValidator(0)])
     category = models.ForeignKey(ProductCategory,on_delete=models.CASCADE)
     manufacturer = models.ForeignKey(Manufacturer,on_delete=models.CASCADE)
 
