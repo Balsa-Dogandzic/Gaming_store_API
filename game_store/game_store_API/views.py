@@ -1,12 +1,9 @@
-from django.http import JsonResponse
 from rest_framework import status,generics, views
 from rest_framework.response import Response
 from .serializers import RegisterSerializer, TokenObtainPairSerializer, UserSerializer
-from django.contrib.auth import authenticate
 from rest_framework_simplejwt.views import TokenViewBase
 from .models import User
 from .permissions import UserIsAdmin
-
 
 
 class RegisterView(generics.GenericAPIView):
@@ -61,7 +58,12 @@ class UserDetails(views.APIView):
     def get(self, request, pk, format=None):
         user = self.get_object(pk)
         serializer = UserSerializer(user)
-        return JsonResponse(serializer.data)
+        return Response({
+            "status": status.HTTP_200_OK,
+            "success": True,
+            "message": "Requested user data",
+            "data":serializer.data
+            },status= status.HTTP_200_OK)
     def put(self, request, pk, format=None):
         user = self.get_object(pk=pk)
         data=request.data
@@ -79,7 +81,6 @@ class UserDetails(views.APIView):
                 'success': False,
                 'message': 'User not approved'
                 },status = status.HTTP_400_BAD_REQUEST)
-
 
 
 class TokenObtainPairView(TokenViewBase):

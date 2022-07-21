@@ -1,15 +1,14 @@
-from django.db import models
-
+from email.mime import image
 from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractUser
 )
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class MyUserManager(BaseUserManager):
     def create_user(self, username, password=None):
         if not username:
             raise ValueError('Users must have an email address')
-
         user = self.model(
             username=self.username,
         )
@@ -50,7 +49,54 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
-    balance = models.DecimalField(max_digits=11, decimal_places=2, default=1000)
+    balance = models.DecimalField(max_digits=11, decimal_places=2, default=1000,validators=[MaxValueValidator(1000),MinValueValidator(0)])
     objects: MyUserManager()
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
+
+
+class ProductCategory(models.Model):
+    name = models.CharField(max_length=32,primary_key=True)
+    image = models.FileField(upload_to='categories/')
+
+    def __str__(self):
+        return self.name
+
+
+class Manufacturer(models.Model):
+    name = models.CharField(max_length=32,primary_key=True)
+
+    def __str__(self):
+        return self.name
+
+    
+class ComponentType(models.Model):
+    name = models.CharField(max_length=32,primary_key=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Component(models.Model):
+    name = models.CharField(max_length=32,primary_key=True)
+    type = models.ForeignKey(ComponentType,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=32)
+    image = models.FileField(upload_to='products/')
+    description = models.TextField()
+    category = models.ForeignKey(ProductCategory,on_delete=models.CASCADE)
+    manufacturer = models.ForeignKey(Manufacturer,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class Specifications(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    component = models.ForeignKey(Component,on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1,validators=[MaxValueValidator(10),MinValueValidator(1)])

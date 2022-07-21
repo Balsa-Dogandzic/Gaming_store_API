@@ -27,6 +27,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TokenObtainPairSerializer(TokenObtainSerializer):
+    default_error_messages = {
+        "no_active_account": {'message':'No active account with the given credentials'}
+    }
     @classmethod
     def get_token(cls, user):
         return RefreshToken.for_user(user)
