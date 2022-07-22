@@ -77,7 +77,7 @@ class ComponentType(models.Model):
 
 
 class Component(models.Model):
-    name = models.CharField(max_length=32,unique=True)
+    name = models.CharField(max_length=32)
     type = models.ForeignKey(ComponentType,on_delete=models.CASCADE)
     manufacturer = models.ForeignKey(Manufacturer,on_delete=models.CASCADE)
 

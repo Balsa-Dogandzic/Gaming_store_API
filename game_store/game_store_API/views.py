@@ -1,6 +1,6 @@
 from rest_framework import status,generics, viewsets
 from rest_framework.response import Response
-from .serializers import CategorySerializer, ComponentSerializer, ComponentTypeSerializer, ManufacturerSerializer, RegisterSerializer, TokenObtainPairSerializer, UserSerializer
+from .serializers import CategorySerializer, ComponentSerializer, ComponentTypeSerializer, DetailedComponentSerializers, ManufacturerSerializer, RegisterSerializer, TokenObtainPairSerializer, UserSerializer
 from rest_framework_simplejwt.views import TokenViewBase
 from .models import Component, ComponentType, Manufacturer, User, ProductCategory
 from .permissions import AdminUserOrReadOnly, UserIsAdmin
@@ -204,10 +204,35 @@ class ComponentView(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.model.objects.all()
     def list(self, request, *args, **kwargs):
-        serializer = ComponentSerializer(self.queryset, many=True)
+        serializer = DetailedComponentSerializers(self.queryset, many=True)
         return Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
                 "message": "List of all the components",
                 "data": serializer.data
             },status = status.HTTP_200_OK)
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        component = get_object_or_404(self.queryset, pk=pk)
+        serializer = DetailedComponentSerializers(component)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "Requested component data",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response({
+                "status": status.HTTP_201_CREATED,
+                "success": True,
+                "message": "Component type Created Successfully.",
+                "data": serializer.data,
+            },status = status.HTTP_201_CREATED)
+        else:
+            return Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "Component not created"
+            },status = status.HTTP_400_BAD_REQUEST)

@@ -79,3 +79,10 @@ class ComponentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Component
         fields = "__all__"
+
+class DetailedComponentSerializers(serializers.ModelSerializer):
+    type = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    manufacturer = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    class Meta:
+        model = Component
+        fields = ['id','name','type','manufacturer']
