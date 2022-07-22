@@ -1,4 +1,3 @@
-from email.mime import image
 from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractUser
@@ -56,7 +55,7 @@ class User(AbstractUser):
 
 
 class ProductCategory(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32,unique=True)
     image = models.FileField(upload_to='categories/')
 
     def __str__(self):
@@ -64,21 +63,21 @@ class ProductCategory(models.Model):
 
 
 class Manufacturer(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32,unique=True)
 
     def __str__(self):
         return self.name
 
     
 class ComponentType(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32,unique=True)
 
     def __str__(self):
         return self.name
 
 
 class Component(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32,unique=True)
     type = models.ForeignKey(ComponentType,on_delete=models.CASCADE)
 
     def __str__(self):

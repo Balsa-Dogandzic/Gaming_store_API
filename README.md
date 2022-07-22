@@ -9,6 +9,10 @@ Rutiranje unutar API:
 - http://127.0.0.1:8000/api/token/ - POST zahtjev sa parametrima username, password. Vrace access i refresh token i informacije o korisniku kao odgovor.
 - http://127.0.0.1:8000/api/token/refresh/ - POST zahtjev koji koristi refresh token i na osnovu njega pravi novi access token. 
 - http://127.0.0.1:8000/api/inactive/ - GET request koji sadrzi informacije o neaktivnim korisnicima.
-- http://127.0.0.1:8000/api/inactive/(id od user-a)/ - GET i PUT zahtjevi, PUT zahtjev prihvata is_active kao podatak i mijenja ga u true ili false. Ukoliko se proslijedi drugi parametar vraca se greska u odgovoru. Samo admin moze uspjesno izvrsiti ove zahtjeve.
+- http://127.0.0.1:8000/api/inactive/(id od user-a)/ - GET,PUT i DELETE zahtjevi, PUT zahtjev prihvata is_active kao podatak i mijenja ga u true ili false. Ukoliko se proslijedi drugi parametar vraca se greska u odgovoru. Samo admin moze uspjesno izvrsiti ove zahtjeve.
 - http://127.0.0.1:8000/api/category/ - GET i POST zahtjevi za dodavanje i gledanje kategorija. U POST zahtjevu se salju name i image(kao fajl), samo admin ima permisije za POST dok svi ostali mogu da gledaju dostupne kategorije
 - http://127.0.0.1:8000/api/category/(id kategorije)/ - GET zahtjev vrace jednu kategoriju, ukoliko ne postoji trazena kategorija vrace 404 error. Nisu potrebne permisije za ovaj zahtjev
+- http://127.0.0.1:8000/api/manufacturer/ - GET i POST zahtjevi. Parametri za POST je samo name, samo admin moze da dodaje proizvodjace.
+- http://127.0.0.1:8000/api/manufacturer/(id od proizvodjaca) - GET zahtjev vrace trazenog proizvodjaca
+- http://127.0.0.1:8000/api/component_type/ - GET i POST zahtjevi. Parametri za POST je samo name, samo admin moze da dodaje tipove komponenata.
+- http://127.0.0.1:8000/api/manufacturer/(id od proizvodjaca) - GET zahtjev vrace trazen tip komponente.

@@ -1,9 +1,8 @@
-from django.http import HttpResponse
 from rest_framework import status,generics, viewsets
 from rest_framework.response import Response
-from .serializers import CategorySerializer, RegisterSerializer, TokenObtainPairSerializer, UserSerializer
+from .serializers import CategorySerializer, ComponentTypeSerializer, ManufacturerSerializer, RegisterSerializer, TokenObtainPairSerializer, UserSerializer
 from rest_framework_simplejwt.views import TokenViewBase
-from .models import User, ProductCategory
+from .models import ComponentType, Manufacturer, User, ProductCategory
 from .permissions import AdminUserOrReadOnly, UserIsAdmin
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -70,7 +69,15 @@ class ApproveViewSet(viewsets.ModelViewSet):
                 "success": False,
                 "message": "User not approved.",
             },status = status.HTTP_400_BAD_REQUEST)
-    
+    def destroy(self, request, pk=None, *args, **kwargs):
+        user = get_object_or_404(self.queryset, pk=pk)
+        user.delete()
+        return Response({
+            "status": status.HTTP_202_ACCEPTED,
+            "success": True,
+            "message": "User successfully deleted."
+        },status = status.HTTP_202_ACCEPTED)
+
 
 class TokenObtainPairView(TokenViewBase):
     serializer_class = TokenObtainPairSerializer
@@ -78,7 +85,7 @@ class TokenObtainPairView(TokenViewBase):
 
 class CategoryView(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
-    queryset = ProductCategory.objects.all().order_by('name')
+    queryset = ProductCategory.objects.all().order_by('id')
     parser_classes = (MultiPartParser, FormParser)
     permission_classes = [AdminUserOrReadOnly]
     model = ProductCategory
@@ -103,3 +110,87 @@ class CategoryView(viewsets.ModelViewSet):
             },status = status.HTTP_200_OK)
     def perform_create(self, serializer):
         serializer.save()
+
+
+class ManufacturerView(viewsets.ModelViewSet):
+    serializer_class = ManufacturerSerializer
+    queryset = Manufacturer.objects.all().order_by('id')
+    permission_classes = [AdminUserOrReadOnly]
+    model = Manufacturer
+    def get_queryset(self):
+        return self.model.objects.all()
+    def list(self, request, *args, **kwargs):
+        serializer = ManufacturerSerializer(self.queryset, many=True)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "List of all the manufacturers",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        manufacturer = get_object_or_404(self.queryset, pk=pk)
+        serializer = ManufacturerSerializer(manufacturer)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "Requested manufacturer data",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response({
+                "status": status.HTTP_201_CREATED,
+                "success": True,
+                "message": "Manufacturer Created Successfully.",
+                "data": serializer.data,
+            },status = status.HTTP_201_CREATED)
+        else:
+            return Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "Manufacturer not created"
+            },status = status.HTTP_400_BAD_REQUEST)
+
+
+class ComponentTypeView(viewsets.ModelViewSet):
+    serializer_class = ComponentTypeSerializer
+    queryset = ComponentType.objects.all().order_by('id')
+    permission_classes = [AdminUserOrReadOnly]
+    model = ComponentType
+    def get_queryset(self):
+        return self.model.objects.all()
+    def list(self, request, *args, **kwargs):
+        serializer = ComponentTypeSerializer(self.queryset, many=True)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "List of all the component types",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        type = get_object_or_404(self.queryset, pk=pk)
+        serializer = ComponentTypeSerializer(type)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "Requested component type data",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response({
+                "status": status.HTTP_201_CREATED,
+                "success": True,
+                "message": "Component type Created Successfully.",
+                "data": serializer.data,
+            },status = status.HTTP_201_CREATED)
+        else:
+            return Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "Component type not created"
+            },status = status.HTTP_400_BAD_REQUEST)

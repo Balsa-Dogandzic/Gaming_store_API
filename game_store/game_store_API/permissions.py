@@ -19,7 +19,7 @@ class UserIsAdmin(permissions.BasePermission):
     allowed = ("GET","PUT","DELETE")
 
     def has_permission(self, request, view):
-        if request.user.is_authenticated and request.user.admin:
+        if request.user.is_authenticated and request.user.admin and request.method in self.allowed:
             return True
         raise NotAdmin()
 
@@ -30,7 +30,8 @@ class UserIsAdmin(permissions.BasePermission):
 
 
 class AdminUserOrReadOnly(permissions.BasePermission):
+    allowed = ("GET","POST")
     def has_permission(self, request, view):
-        if (request.user.is_authenticated and request.user.admin) or request.method in SAFE_METHODS:
+        if ((request.user.is_authenticated and request.user.admin) or request.method in SAFE_METHODS) and request.method in self.allowed:
             return True
         raise NotAdmin()
