@@ -1,11 +1,11 @@
 from django.urls import include, path
-from .views import ApproveViewSet, RegisterView,TokenObtainPairView
-"""UserDetails, InactiveUsersSet,""" 
+from .views import ApproveViewSet, CategoryView, RegisterView,TokenObtainPairView
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'inactive', ApproveViewSet, basename='user')
+router.register(r'category', CategoryView, basename='category')
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

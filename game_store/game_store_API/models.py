@@ -56,7 +56,7 @@ class User(AbstractUser):
 
 
 class ProductCategory(models.Model):
-    name = models.CharField(max_length=32,primary_key=True)
+    name = models.CharField(max_length=32)
     image = models.FileField(upload_to='categories/')
 
     def __str__(self):
@@ -64,21 +64,21 @@ class ProductCategory(models.Model):
 
 
 class Manufacturer(models.Model):
-    name = models.CharField(max_length=32,primary_key=True)
+    name = models.CharField(max_length=32)
 
     def __str__(self):
         return self.name
 
     
 class ComponentType(models.Model):
-    name = models.CharField(max_length=32,primary_key=True)
+    name = models.CharField(max_length=32)
 
     def __str__(self):
         return self.name
 
 
 class Component(models.Model):
-    name = models.CharField(max_length=32,primary_key=True)
+    name = models.CharField(max_length=32)
     type = models.ForeignKey(ComponentType,on_delete=models.CASCADE)
 
     def __str__(self):

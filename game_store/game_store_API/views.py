@@ -1,11 +1,12 @@
-from rest_framework import status,generics, views, viewsets
+from django.http import HttpResponse
+from rest_framework import status,generics, viewsets
 from rest_framework.response import Response
-from .serializers import RegisterSerializer, TokenObtainPairSerializer, UserSerializer
+from .serializers import CategorySerializer, RegisterSerializer, TokenObtainPairSerializer, UserSerializer
 from rest_framework_simplejwt.views import TokenViewBase
-from .models import User
-from .permissions import UserIsAdmin
+from .models import User, ProductCategory
+from .permissions import AdminUserOrReadOnly, UserIsAdmin
 from django.shortcuts import get_object_or_404
-
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -73,3 +74,32 @@ class ApproveViewSet(viewsets.ModelViewSet):
 
 class TokenObtainPairView(TokenViewBase):
     serializer_class = TokenObtainPairSerializer
+
+
+class CategoryView(viewsets.ModelViewSet):
+    serializer_class = CategorySerializer
+    queryset = ProductCategory.objects.all().order_by('name')
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [AdminUserOrReadOnly]
+    model = ProductCategory
+    def get_queryset(self):
+        return self.model.objects.all()
+    def list(self, request, *args, **kwargs):
+        serializer = CategorySerializer(self.queryset, many=True)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "List of all the categories",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        category = get_object_or_404(self.queryset, pk=pk)
+        serializer = CategorySerializer(category)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "Requested category data",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+    def perform_create(self, serializer):
+        serializer.save()

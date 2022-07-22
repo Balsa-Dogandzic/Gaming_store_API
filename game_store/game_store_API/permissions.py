@@ -2,6 +2,7 @@
 A file for custom permissions
 """
 from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework import status
 from rest_framework.exceptions import APIException
 
@@ -26,3 +27,10 @@ class UserIsAdmin(permissions.BasePermission):
         if request.user.admin and request.method in self.allowed:
             return True
         return False
+
+
+class AdminUserOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if (request.user.is_authenticated and request.user.admin) or request.method in SAFE_METHODS:
+            return True
+        raise NotAdmin()
