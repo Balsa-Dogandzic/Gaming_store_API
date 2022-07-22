@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 from rest_framework import status,generics, viewsets
 from rest_framework.response import Response
 from .serializers import CategorySerializer, ComponentSerializer, ComponentTypeSerializer, DetailedComponentSerializers, ManufacturerSerializer, RegisterSerializer, TokenObtainPairSerializer, UserSerializer
@@ -138,20 +139,15 @@ class ManufacturerView(viewsets.ModelViewSet):
             },status = status.HTTP_200_OK)
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            return Response({
-                "status": status.HTTP_201_CREATED,
-                "success": True,
-                "message": "Manufacturer Created Successfully.",
-                "data": serializer.data,
-            },status = status.HTTP_201_CREATED)
-        else:
-            return Response({
-                "status": status.HTTP_400_BAD_REQUEST,
-                "success": False,
-                "message": "Manufacturer not created"
-            },status = status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({
+            "status": status.HTTP_201_CREATED,
+            "success": True,
+            "message": "Manufacturer Created Successfully.",
+            "data": serializer.data,
+        },status = status.HTTP_201_CREATED)
+        
 
 
 class ComponentTypeView(viewsets.ModelViewSet):
@@ -180,26 +176,21 @@ class ComponentTypeView(viewsets.ModelViewSet):
             },status = status.HTTP_200_OK)
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            return Response({
-                "status": status.HTTP_201_CREATED,
-                "success": True,
-                "message": "Component type Created Successfully.",
-                "data": serializer.data,
-            },status = status.HTTP_201_CREATED)
-        else:
-            return Response({
-                "status": status.HTTP_400_BAD_REQUEST,
-                "success": False,
-                "message": "Component type not created"
-            },status = status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({
+            "status": status.HTTP_201_CREATED,
+            "success": True,
+            "message": "Component type Created Successfully.",
+            "data": serializer.data,
+        },status = status.HTTP_201_CREATED)
+        
 
 
 class ComponentView(viewsets.ModelViewSet):
     serializer_class = ComponentSerializer
     queryset = Component.objects.all().order_by('id')
-    # permission_classes = [AdminUserOrReadOnly]
+    permission_classes = [AdminUserOrReadOnly]
     model = Component
     def get_queryset(self):
         return self.model.objects.all()
@@ -222,17 +213,12 @@ class ComponentView(viewsets.ModelViewSet):
             },status = status.HTTP_200_OK)
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            return Response({
-                "status": status.HTTP_201_CREATED,
-                "success": True,
-                "message": "Component type Created Successfully.",
-                "data": serializer.data,
-            },status = status.HTTP_201_CREATED)
-        else:
-            return Response({
-                "status": status.HTTP_400_BAD_REQUEST,
-                "success": False,
-                "message": "Component not created"
-            },status = status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({
+            "status": status.HTTP_201_CREATED,
+            "success": True,
+            "message": "Component type Created Successfully.",
+            "data": serializer.data,
+        },status = status.HTTP_201_CREATED)
+        

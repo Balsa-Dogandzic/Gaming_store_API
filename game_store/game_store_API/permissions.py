@@ -32,6 +32,6 @@ class UserIsAdmin(permissions.BasePermission):
 class AdminUserOrReadOnly(permissions.BasePermission):
     allowed = ("GET","POST")
     def has_permission(self, request, view):
-        if ((request.user.is_authenticated and request.user.admin) or request.method in SAFE_METHODS) and request.method in self.allowed:
+        if (request.user.is_authenticated and request.user.admin and request.method in self.allowed) or request.method in SAFE_METHODS:
             return True
         raise NotAdmin()
