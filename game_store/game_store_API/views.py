@@ -1,8 +1,8 @@
 from rest_framework import status,generics, viewsets
 from rest_framework.response import Response
-from .serializers import CategorySerializer, ComponentTypeSerializer, ManufacturerSerializer, RegisterSerializer, TokenObtainPairSerializer, UserSerializer
+from .serializers import CategorySerializer, ComponentSerializer, ComponentTypeSerializer, ManufacturerSerializer, RegisterSerializer, TokenObtainPairSerializer, UserSerializer
 from rest_framework_simplejwt.views import TokenViewBase
-from .models import ComponentType, Manufacturer, User, ProductCategory
+from .models import Component, ComponentType, Manufacturer, User, ProductCategory
 from .permissions import AdminUserOrReadOnly, UserIsAdmin
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -194,3 +194,20 @@ class ComponentTypeView(viewsets.ModelViewSet):
                 "success": False,
                 "message": "Component type not created"
             },status = status.HTTP_400_BAD_REQUEST)
+
+
+class ComponentView(viewsets.ModelViewSet):
+    serializer_class = ComponentSerializer
+    queryset = Component.objects.all().order_by('id')
+    # permission_classes = [AdminUserOrReadOnly]
+    model = Component
+    def get_queryset(self):
+        return self.model.objects.all()
+    def list(self, request, *args, **kwargs):
+        serializer = ComponentSerializer(self.queryset, many=True)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "List of all the components",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)

@@ -1,7 +1,6 @@
-from dataclasses import field
 from rest_framework import  serializers
 from game_store.settings import SIMPLE_JWT
-from .models import ComponentType, Manufacturer, ProductCategory, User
+from .models import Component, ComponentType, Manufacturer, ProductCategory, User
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
@@ -74,3 +73,9 @@ class ComponentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComponentType
         fields = '__all__'
+
+
+class ComponentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Component
+        fields = "__all__"
