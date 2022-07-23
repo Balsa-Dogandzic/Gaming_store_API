@@ -98,6 +98,8 @@ class Product(models.Model):
 
 
 class Specifications(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='specs')
     component = models.ForeignKey(Component,on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1,validators=[MaxValueValidator(10),MinValueValidator(1)])
+    class Meta:
+        unique_together = ('product','component')

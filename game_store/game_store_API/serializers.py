@@ -1,6 +1,7 @@
+from dataclasses import field, fields
 from rest_framework import  serializers
 from game_store.settings import SIMPLE_JWT
-from .models import Component, ComponentType, Manufacturer, ProductCategory, User
+from .models import Component, ComponentType, Manufacturer, Product, ProductCategory, Specifications, User
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
@@ -86,3 +87,38 @@ class DetailedComponentSerializers(serializers.ModelSerializer):
     class Meta:
         model = Component
         fields = ['id','name','type','manufacturer']
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+
+class ProductListSerializer(serializers.HyperlinkedModelSerializer):
+    category = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    manufacturer = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    class Meta:
+        model = Product
+        fields = ['id','name','url','category','manufacturer','image','description','price']
+
+
+class SpecificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Specifications
+        fields = '__all__'
+
+
+class SpecificationDetailSerializer(serializers.ModelSerializer):
+    component = DetailedComponentSerializers(read_only=True)
+    class Meta:
+        model = Specifications
+        fields = ['id','component','quantity']
+
+class ProductRetrieveSerializer(serializers.HyperlinkedModelSerializer):
+    category = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    manufacturer = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    specs = SpecificationDetailSerializer(read_only=True, many=True)
+    class Meta:
+        model = Product
+        fields = ['id','name','url','category','manufacturer','image','description','price','specs']

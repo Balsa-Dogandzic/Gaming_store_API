@@ -1,9 +1,9 @@
 from logging import raiseExceptions
 from rest_framework import status,generics, viewsets
 from rest_framework.response import Response
-from .serializers import CategorySerializer, ComponentSerializer, ComponentTypeSerializer, DetailedComponentSerializers, ManufacturerSerializer, RegisterSerializer, TokenObtainPairSerializer, UserSerializer
+from .serializers import CategorySerializer, ComponentSerializer, ComponentTypeSerializer, DetailedComponentSerializers, ManufacturerSerializer, ProductListSerializer, ProductRetrieveSerializer, ProductSerializer, RegisterSerializer, SpecificationDetailSerializer, SpecificationSerializer, TokenObtainPairSerializer, UserSerializer
 from rest_framework_simplejwt.views import TokenViewBase
-from .models import Component, ComponentType, Manufacturer, User, ProductCategory
+from .models import Component, ComponentType, Manufacturer, Product, Specifications, User, ProductCategory
 from .permissions import AdminUserOrReadOnly, UserIsAdmin
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -221,4 +221,87 @@ class ComponentView(viewsets.ModelViewSet):
             "message": "Component type Created Successfully.",
             "data": serializer.data,
         },status = status.HTTP_201_CREATED)
-        
+
+
+class ProductView(viewsets.ModelViewSet):
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all().order_by('id')
+    permission_classes = [AdminUserOrReadOnly]
+    model = Product
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_queryset(self):
+        return self.model.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        serializer = ProductListSerializer(self.queryset, many=True, context={'request': request})
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "List of all the products",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        component = get_object_or_404(self.queryset, pk=pk)
+        serializer = ProductRetrieveSerializer(component,context={'request': request})
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "Requested product data",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({
+            "status": status.HTTP_201_CREATED,
+            "success": True,
+            "message": "Manufacturer Created Successfully.",
+            "data": serializer.data,
+        },status = status.HTTP_201_CREATED)
+
+
+class SpecificationView(viewsets.ModelViewSet):
+    serializer_class = SpecificationSerializer
+    queryset = Specifications.objects.all().order_by('id')
+    permission_classes = [AdminUserOrReadOnly]
+    model = Specifications
+
+    def get_queryset(self):
+        return self.model.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        serializer = SpecificationSerializer(self.queryset, many=True)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "List of all the specs",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+    
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        specification = get_object_or_404(self.queryset, pk=pk)
+        serializer = SpecificationDetailSerializer(specification)
+        return Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "Requested spec data",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({
+            "status": status.HTTP_201_CREATED,
+            "success": True,
+            "message": "Specification Created Successfully.",
+            "data": serializer.data,
+        },status = status.HTTP_201_CREATED)
