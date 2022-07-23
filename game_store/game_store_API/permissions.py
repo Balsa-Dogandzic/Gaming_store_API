@@ -24,7 +24,7 @@ class UserIsAdmin(permissions.BasePermission):
         raise NotAdmin()
 
     def has_object_permission(self, request, view, obj):
-        if request.user.admin and request.method in self.allowed:
+        if request.user.is_authenticated and request.user.admin:
             return True
         return False
 

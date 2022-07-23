@@ -8,6 +8,7 @@ from .permissions import AdminUserOrReadOnly, UserIsAdmin
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
 
+
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
     def post(self, request, *args,  **kwargs):
@@ -32,8 +33,12 @@ class ApproveViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.filter(is_active=False).order_by('id')
     permission_classes = [UserIsAdmin,]
+    def get_queryset(self):
+        queryset = User.objects.filter(is_active=False).order_by('id')
+        return queryset
     def list(self, request):
-        serializer = UserSerializer(self.queryset, many=True,context={'request': request})
+        queryset = self.get_queryset()
+        serializer = UserSerializer(queryset, many=True,context={'request': request})
         return Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -50,7 +55,6 @@ class ApproveViewSet(viewsets.ModelViewSet):
                 "message": "Requested user data",
                 "data": serializer.data
             },status = status.HTTP_200_OK)
-    
     def update(self, request, pk = None, *args, **kwargs):
         user = get_object_or_404(self.queryset,pk=pk)
         serializer = UserSerializer(user, context={'request': request})
@@ -91,9 +95,10 @@ class CategoryView(viewsets.ModelViewSet):
     permission_classes = [AdminUserOrReadOnly]
     model = ProductCategory
     def get_queryset(self):
-        return self.model.objects.all()
+        return self.model.objects.all().order_by('id')
     def list(self, request, *args, **kwargs):
-        serializer = CategorySerializer(self.queryset, many=True)
+        data = self.get_queryset()
+        serializer = CategorySerializer(data, many=True)
         return Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -121,7 +126,8 @@ class ManufacturerView(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.model.objects.all()
     def list(self, request, *args, **kwargs):
-        serializer = ManufacturerSerializer(self.queryset, many=True)
+        data = self.get_queryset()
+        serializer = ManufacturerSerializer(data, many=True)
         return Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -158,7 +164,8 @@ class ComponentTypeView(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.model.objects.all()
     def list(self, request, *args, **kwargs):
-        serializer = ComponentTypeSerializer(self.queryset, many=True)
+        data = self.get_queryset()
+        serializer = ComponentTypeSerializer(data, many=True)
         return Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -195,7 +202,8 @@ class ComponentView(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.model.objects.all()
     def list(self, request, *args, **kwargs):
-        serializer = DetailedComponentSerializers(self.queryset, many=True)
+        data = self.get_queryset()
+        serializer = DetailedComponentSerializers(data, many=True)
         return Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -234,7 +242,8 @@ class ProductView(viewsets.ModelViewSet):
         return self.model.objects.all()
 
     def list(self, request, *args, **kwargs):
-        serializer = ProductListSerializer(self.queryset, many=True, context={'request': request})
+        data = self.get_queryset()
+        serializer = ProductListSerializer(data, many=True, context={'request': request})
         return Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -262,7 +271,7 @@ class ProductView(viewsets.ModelViewSet):
         return Response({
             "status": status.HTTP_201_CREATED,
             "success": True,
-            "message": "Manufacturer Created Successfully.",
+            "message": "Product Created Successfully.",
             "data": serializer.data,
         },status = status.HTTP_201_CREATED)
 
@@ -277,7 +286,8 @@ class SpecificationView(viewsets.ModelViewSet):
         return self.model.objects.all()
 
     def list(self, request, *args, **kwargs):
-        serializer = SpecificationSerializer(self.queryset, many=True)
+        data = self.get_queryset()
+        serializer = SpecificationSerializer(data, many=True)
         return Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
