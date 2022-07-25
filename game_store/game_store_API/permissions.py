@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.exceptions import APIException
 
 class NotAdmin(APIException):
+    """Custom exeption for permissions"""
     status_code = status.HTTP_403_FORBIDDEN
     default_detail = {
         "message":"You don't have permissions for this action"
@@ -15,7 +16,7 @@ class NotAdmin(APIException):
 
 
 class UserIsAdmin(permissions.BasePermission):
-
+    """Custom admin permission class"""
     allowed = ("GET","PUT","DELETE")
 
     def has_permission(self, request, view):
@@ -30,8 +31,10 @@ class UserIsAdmin(permissions.BasePermission):
 
 
 class AdminUserOrReadOnly(permissions.BasePermission):
+    """Custom admin or read only permission class"""
     allowed = ("GET","POST")
     def has_permission(self, request, view):
-        if (request.user.is_authenticated and request.user.admin and request.method in self.allowed) or request.method in SAFE_METHODS:
+        is_admin = request.user.is_authenticated and request.user.admin
+        if (is_admin and request.method in self.allowed) or request.method in SAFE_METHODS:
             return True
         raise NotAdmin()
