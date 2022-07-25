@@ -4,6 +4,7 @@ from django.contrib.auth.models import (
     BaseUserManager, AbstractUser
 )
 from django.core.validators import MaxValueValidator, MinValueValidator
+# pylint: disable=too-few-public-methods
 
 class MyUserManager(BaseUserManager):
     """Manager for the User model"""
