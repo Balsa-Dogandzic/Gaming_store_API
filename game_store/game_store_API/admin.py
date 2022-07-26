@@ -1,6 +1,7 @@
 """Register your models here"""
 from django.contrib import admin
-from .models import ComponentType,Manufacturer,Product,ProductCategory, Rating,Specifications,User,Component
+from .models import (ComponentType,Manufacturer,Product,ProductCategory,
+Rating,Specifications,User,Component)
 
 class UserAdmin(admin.ModelAdmin):
     """User model register"""

@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.core.validators import MaxValueValidator, MinValueValidator
 # pylint: disable=too-few-public-methods
+# pylint: disable=no-member
 
 class MyUserManager(BaseUserManager):
     """Manager for the User model"""
@@ -111,6 +112,7 @@ class Product(models.Model):
         return str(self.name)
 
     def average_rating(self):
+        """Returns average rating of the product"""
         reviews = Rating.objects.filter(product=self).aggregate(average=models.Avg('rating'))
         average_rating = 0
         if reviews['average'] is not None:

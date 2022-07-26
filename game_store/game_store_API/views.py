@@ -1,13 +1,13 @@
 """Create your views here"""
-from itertools import product
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics,viewsets,response,parsers,permissions
 from rest_framework_simplejwt.views import TokenViewBase
 from .serializers import (CategorySerializer,ComponentSerializer,ComponentTypeSerializer,
 DetailedComponentSerializers,ManufacturerSerializer,ProductListSerializer,ProductRetrieveSerializer,
-ProductSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,SpecificationSerializer,
-TokenObtainPairSerializer,UserSerializer)
-from .models import Component,ComponentType,Manufacturer,Product, Rating,Specifications,User,ProductCategory
+ProductSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,
+SpecificationSerializer,TokenObtainPairSerializer,UserSerializer)
+from .models import (Component,ComponentType,Manufacturer,Product, Rating,
+Specifications,User,ProductCategory)
 from .permissions import AdminUserOrReadOnly, UserIsAdmin
 # pylint: disable=too-many-ancestors
 # pylint: disable=no-member
@@ -359,9 +359,9 @@ class RatingsView(viewsets.ModelViewSet):
     # permission_classes = [permissions.IsAuthenticated,]
     def get_queryset(self):
         queryset = Rating.objects.all().order_by('id')
-        product = self.request.query_params.get('product')
-        if product is not None:
-            queryset = queryset.filter(product__name = product)
+        product_name = self.request.query_params.get('product')
+        if product_name is not None:
+            queryset = queryset.filter(product__name = product_name)
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -373,7 +373,7 @@ class RatingsView(viewsets.ModelViewSet):
                 "message": "List of all the ratings",
                 "data": serializer.data
             },status = status.HTTP_200_OK)
-    
+
     def retrieve(self, request, *args, pk=None,**kwargs):
         queryset = self.get_queryset()
         rating = get_object_or_404(queryset, pk=pk)
@@ -384,7 +384,7 @@ class RatingsView(viewsets.ModelViewSet):
             "message":"Requested rating retrieved",
             "data":serializer.data
         })
-    
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

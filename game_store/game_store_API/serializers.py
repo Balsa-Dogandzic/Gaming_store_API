@@ -131,7 +131,8 @@ class ProductListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         """Meta class for this serializer"""
         model = Product
-        fields = ['id','name','url','category','manufacturer','image','description','price','average_rating']
+        fields = ['id','name','url','category','manufacturer','image',
+            'description','price','average_rating']
 
 
 class SpecificationSerializer(serializers.ModelSerializer):
@@ -158,7 +159,8 @@ class ProductRetrieveSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         """Meta class for this serializer"""
         model = Product
-        fields = ['id','name','url','category','manufacturer','image','description','price','average_rating','specs']
+        fields = ['id','name','url','category','manufacturer','image','description',
+            'price','average_rating','specs']
 
 class RatingSerializer(serializers.ModelSerializer):
     """Rating serializer"""
