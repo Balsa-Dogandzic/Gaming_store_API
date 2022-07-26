@@ -110,6 +110,13 @@ class Product(models.Model):
     def __str__(self):
         return str(self.name)
 
+    def average_rating(self):
+        reviews = Rating.objects.filter(product=self).aggregate(average=models.Avg('rating'))
+        average_rating = 0
+        if reviews['average'] is not None:
+            average_rating = float(reviews['average'])
+        return average_rating
+
 
 class Specifications(models.Model):
     """Specifications model"""

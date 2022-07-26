@@ -22,3 +22,5 @@ Rutiranje unutar API:
 - http://127.0.0.1:8000/api/product/(id od proizvoda)/ - GET zahtjev koji izmedju ostalog vrace i podatke o specifikacijama koje proizvod ima
 - http://127.0.0.1:8000/api/specifications/ - GET i POST zahtjev. Na POST-u se salju sledeci podaci product(id od proizvoda), component(id od komponente) i quantity koji ako se ne unese po defaultu je 1. Samo admin korisnik moze da dodaje specifikacije.
 - http://127.0.0.1:8000/api/specifications/(id od specifikacije)/ - vrace trazenu specifikaciju
+- http://127.0.0.1:8000/api/rating/ - GET i POST zahtjev. U POST zahtjevu se salju sledeci podaci user(id od user-a), product(id od product-a), rating(broj od 1 do 5), i comment.
+- http://127.0.0.1:8000/api/rating/(id od recenzije)/ - vrace specificno navedenu recenziju

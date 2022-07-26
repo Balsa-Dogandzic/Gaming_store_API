@@ -319,7 +319,7 @@ class SpecificationView(viewsets.ModelViewSet):
     permission_classes = [AdminUserOrReadOnly]
 
     def get_queryset(self):
-        return Specifications.objects.all().order_by('id')
+        return Specifications.objects.all().order_by('average_rating')
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
