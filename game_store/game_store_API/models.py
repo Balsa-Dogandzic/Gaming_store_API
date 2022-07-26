@@ -120,3 +120,14 @@ class Specifications(models.Model):
     class Meta:
         """Unique together validator"""
         unique_together = ('product','component')
+
+class Rating(models.Model):
+    """Rating model"""
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='ratings')
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='ratings')
+    rating = models.SmallIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)])
+    comment = models.CharField(max_length=140)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        """Unique together validator"""
+        unique_together = ('user','product')

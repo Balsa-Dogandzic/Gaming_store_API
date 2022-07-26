@@ -1,12 +1,13 @@
 """Create your views here"""
+from itertools import product
 from django.shortcuts import get_object_or_404
-from rest_framework import status, generics,viewsets,response,parsers
+from rest_framework import status, generics,viewsets,response,parsers,permissions
 from rest_framework_simplejwt.views import TokenViewBase
 from .serializers import (CategorySerializer,ComponentSerializer,ComponentTypeSerializer,
 DetailedComponentSerializers,ManufacturerSerializer,ProductListSerializer,ProductRetrieveSerializer,
-ProductSerializer,RegisterSerializer,SpecificationDetailSerializer,SpecificationSerializer,
+ProductSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,SpecificationSerializer,
 TokenObtainPairSerializer,UserSerializer)
-from .models import Component,ComponentType,Manufacturer,Product,Specifications,User,ProductCategory
+from .models import Component,ComponentType,Manufacturer,Product, Rating,Specifications,User,ProductCategory
 from .permissions import AdminUserOrReadOnly, UserIsAdmin
 # pylint: disable=too-many-ancestors
 # pylint: disable=no-member
@@ -316,7 +317,6 @@ class SpecificationView(viewsets.ModelViewSet):
     """Spec view class"""
     serializer_class = SpecificationSerializer
     permission_classes = [AdminUserOrReadOnly]
-    model = Specifications
 
     def get_queryset(self):
         return Specifications.objects.all().order_by('id')
@@ -350,5 +350,48 @@ class SpecificationView(viewsets.ModelViewSet):
             "status": status.HTTP_201_CREATED,
             "success": True,
             "message": "Specification Created Successfully.",
+            "data": serializer.data,
+        },status = status.HTTP_201_CREATED)
+
+class RatingsView(viewsets.ModelViewSet):
+    """Ratings view class"""
+    serializer_class = RatingSerializer
+    # permission_classes = [permissions.IsAuthenticated,]
+    def get_queryset(self):
+        queryset = Rating.objects.all().order_by('id')
+        product = self.request.query_params.get('product')
+        if product is not None:
+            queryset = queryset.filter(product__name = product)
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = RatingSerializer(queryset,many=True)
+        return response.Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "List of all the ratings",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+    
+    def retrieve(self, request, *args, pk=None,**kwargs):
+        queryset = self.get_queryset()
+        rating = get_object_or_404(queryset, pk=pk)
+        serializer = RatingSerializer(rating)
+        return response.Response({
+            "status":status.HTTP_200_OK,
+            "success":True,
+            "message":"Requested rating retrieved",
+            "data":serializer.data
+        })
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return response.Response({
+            "status": status.HTTP_201_CREATED,
+            "success": True,
+            "message": "Rating Created Successfully.",
             "data": serializer.data,
         },status = status.HTTP_201_CREATED)

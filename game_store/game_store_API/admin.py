@@ -1,6 +1,6 @@
 """Register your models here"""
 from django.contrib import admin
-from .models import ComponentType,Manufacturer,Product,ProductCategory,Specifications,User,Component
+from .models import ComponentType,Manufacturer,Product,ProductCategory, Rating,Specifications,User,Component
 
 class UserAdmin(admin.ModelAdmin):
     """User model register"""
@@ -29,3 +29,7 @@ admin.site.register(Product, ProductAdmin)
 class SpecificationsAdmin(admin.ModelAdmin):
     """Specs model register"""
 admin.site.register(Specifications,SpecificationsAdmin)
+
+class RatingsAdmin(admin.ModelAdmin):
+    """Rating model admin"""
+admin.site.register(Rating,RatingsAdmin)
