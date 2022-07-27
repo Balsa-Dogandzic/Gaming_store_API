@@ -57,7 +57,7 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
-    balance = models.DecimalField(max_digits=6,decimal_places=2,default=1000,
+    balance = models.FloatField(default=1000,
         validators=[MaxValueValidator(1000),MinValueValidator(0)])
     avatar = models.FileField(upload_to='avatars/',null=True)
     objects: MyUserManager()
@@ -105,8 +105,7 @@ class Product(models.Model):
     name = models.CharField(max_length=32)
     image = models.FileField(upload_to='products/')
     description = models.TextField()
-    price = models.DecimalField(max_digits=6,decimal_places=2,
-        validators=[MaxValueValidator(1000),MinValueValidator(0)])
+    price = models.FloatField(validators=[MaxValueValidator(1000),MinValueValidator(0)])
     category = models.ForeignKey(ProductCategory,on_delete=models.CASCADE)
     manufacturer = models.ForeignKey(Manufacturer,on_delete=models.CASCADE)
 

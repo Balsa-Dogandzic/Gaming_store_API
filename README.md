@@ -19,7 +19,7 @@ Rutiranje unutar API:
 - http://127.0.0.1:8000/api/component/ - GET i POST. Parametri za POST su name, type(id od objekta tipa komponente), manufacturer(od od objekta proizvodjaca)
 - http://127.0.0.1:8000/api/component/(id komponente)/ - GET zahtjev vrace podatke o komponenti.
 - http://127.0.0.1:8000/api/product/ - GET i POST zahtjevi. POST zahtjev kao podatke prihvata name,description,image,price,manufacturer(id od proizvodjaca),category(id od kategorije), takodje samo admin ima pravo na POST request.
-- http://127.0.0.1:8000/api/product/(id od proizvoda)/ - GET zahtjev koji izmedju ostalog vrace i podatke o specifikacijama koje proizvod ima
+- http://127.0.0.1:8000/api/product/(id od proizvoda)/ - GET, PUT i DELETE zahtjev. GET vrace podatke o jednom proizvodu sa njegovim specifikacijama, PUT mijenja bilo koji podatak koji mu se proslijedi. A DELETE brise trazeni proizvod.
 - http://127.0.0.1:8000/api/specifications/ - GET i POST zahtjev. Na POST-u se salju sledeci podaci product(id od proizvoda), component(id od komponente) i quantity koji ako se ne unese po defaultu je 1. Samo admin korisnik moze da dodaje specifikacije.
 - http://127.0.0.1:8000/api/specifications/(id od specifikacije)/ - vrace trazenu specifikaciju
 - http://127.0.0.1:8000/api/rating/ - GET i POST zahtjev. U POST zahtjevu se salju sledeci podaci user(id od user-a), product(id od product-a), rating(broj od 1 do 5), i comment.

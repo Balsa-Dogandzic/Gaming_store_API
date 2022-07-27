@@ -328,6 +328,29 @@ class ProductView(viewsets.ModelViewSet):
             "data": serializer.data,
         },status = status.HTTP_201_CREATED)
 
+    def update(self, request, *args, pk = None,**kwargs):
+        queryset = self.get_queryset()
+        product = get_object_or_404(queryset,pk=pk)
+        serializer = ProductListSerializer(product, data=request.data, partial=True,context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return response.Response({
+            "status": status.HTTP_201_CREATED,
+            "success": True,
+            "message":"Product successfully updated",
+            "data":serializer.data
+        })
+
+    def destroy(self, request,*args,pk=None,**kwargs):
+        queryset = self.get_queryset()
+        user = get_object_or_404(queryset, pk=pk)
+        user.delete()
+        return response.Response({
+            "status": status.HTTP_202_ACCEPTED,
+            "success": True,
+            "message": "Product successfully deleted."
+        },status = status.HTTP_202_ACCEPTED)
+
 
 class SpecificationView(viewsets.ModelViewSet):
     """Spec view class"""
@@ -402,7 +425,7 @@ class RatingsView(viewsets.ModelViewSet):
             "success":True,
             "message":"Requested rating retrieved",
             "data":serializer.data
-        })
+        },status = status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -482,7 +505,7 @@ class OrderView(viewsets.ModelViewSet):
             "success": True,
             "message":"Your orders.",
             "data":serializer.data
-        })
+        },status = status.HTTP_200_OK)
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
