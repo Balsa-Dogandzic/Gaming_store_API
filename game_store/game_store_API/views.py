@@ -1,4 +1,5 @@
 """Create your views here"""
+from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics,viewsets,response,parsers,permissions
 from rest_framework_simplejwt.views import TokenViewBase
@@ -32,7 +33,7 @@ class RegisterView(generics.GenericAPIView):
 class ApproveViewSet(viewsets.ModelViewSet):
     """Class for inactive user approvement"""
     serializer_class = UserSerializer
-    permission_classes = [UserIsAdmin,]
+    # permission_classes = [UserIsAdmin,]
 
     def get_queryset(self):
         queryset = User.objects.filter(is_active=False).order_by('id')
@@ -79,6 +80,12 @@ class ApproveViewSet(viewsets.ModelViewSet):
                 "success": False,
                 "message": "User not approved.",
             },status = status.HTTP_400_BAD_REQUEST)
+        except ValidationError:
+            return response.Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "User not approved.",
+            },status = status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request,*args,pk=None,**kwargs):
         queryset = self.get_queryset()
@@ -101,6 +108,7 @@ class CategoryView(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     parser_classes = (parsers.MultiPartParser,parsers.FormParser)
     permission_classes = [AdminUserOrReadOnly]
+    http_method_names = ['get','post']
 
     def get_queryset(self):
         return ProductCategory.objects.all().order_by('id')
@@ -145,6 +153,7 @@ class ManufacturerView(viewsets.ModelViewSet):
     """Manufacturer view class"""
     serializer_class = ManufacturerSerializer
     permission_classes = [AdminUserOrReadOnly]
+    http_method_names = ['get','post']
 
     def get_queryset(self):
         return Manufacturer.objects.all().order_by('id')
@@ -186,6 +195,7 @@ class ComponentTypeView(viewsets.ModelViewSet):
     """Component type view class"""
     serializer_class = ComponentTypeSerializer
     permission_classes = [AdminUserOrReadOnly]
+    http_method_names = ['get','post']
 
     def get_queryset(self):
         return ComponentType.objects.all().order_by('id')
@@ -227,6 +237,7 @@ class ComponentView(viewsets.ModelViewSet):
     """Component view class"""
     serializer_class = ComponentSerializer
     permission_classes = [AdminUserOrReadOnly]
+    http_method_names = ['get','post']
 
     def get_queryset(self):
         return Component.objects.all().order_by('id')
@@ -269,6 +280,7 @@ class ProductView(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [AdminUserOrReadOnly]
     parser_classes = (parsers.MultiPartParser,parsers.FormParser)
+    http_method_names = ['get','post','put','delete']
 
     def get_queryset(self):
         queryset = Product.objects.all().order_by('id')
@@ -356,7 +368,9 @@ class SpecificationView(viewsets.ModelViewSet):
 class RatingsView(viewsets.ModelViewSet):
     """Ratings view class"""
     serializer_class = RatingSerializer
-    # permission_classes = [permissions.IsAuthenticated,]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    http_method_names = ['get','post']
+
     def get_queryset(self):
         queryset = Rating.objects.all().order_by('id')
         product_name = self.request.query_params.get('product')
@@ -395,3 +409,52 @@ class RatingsView(viewsets.ModelViewSet):
             "message": "Rating Created Successfully.",
             "data": serializer.data,
         },status = status.HTTP_201_CREATED)
+        
+class ProfileView(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (parsers.MultiPartParser,parsers.FormParser)
+    http_method_names = ['put','patch']
+
+    def get_queryset(self):
+        return User.objects.all().order_by('id')
+
+    def update(self, request, *args, pk=None, **kwargs):
+        queryset = self.get_queryset()
+        user = get_object_or_404(queryset,pk=pk)
+        serializer = UserSerializer(user, context={'request': request})
+        data = request.data
+        try:
+            user.avatar = data["avatar"]
+            user.save()
+            return response.Response({
+                "status": status.HTTP_201_CREATED,
+                "success": True,
+                "message": "Image successfully uploaded.",
+                "data": serializer.data
+            },status = status.HTTP_201_CREATED)
+        except KeyError:
+            return response.Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "Something went wrong.",
+            },status = status.HTTP_400_BAD_REQUEST)
+    
+    def partial_update(self, request, *args, pk=None, **kwargs):
+        queryset = self.get_queryset()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = UserSerializer(user, data=request.data, partial=True,context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        if serializer.data.get('password') is None and serializer.data.get('admin') is None:
+            serializer.save()
+            return response.Response({
+                "status":status.HTTP_201_CREATED,
+                "success": True,
+                "message":"Successfully updated",
+                "data":serializer.data
+                },status = status.HTTP_201_CREATED)
+        return response.Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "Something went wrong.",
+            },status = status.HTTP_400_BAD_REQUEST)

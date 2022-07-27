@@ -31,7 +31,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         """Meta class for this serializer"""
         model = User
         fields = ['id','url','username','email','password','first_name',
-        'last_name','is_active','admin','date_joined','last_login']
+        'last_name','is_active','admin','avatar',
+        'date_joined','last_login']
 
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -40,7 +41,7 @@ class LoginSerializer(serializers.ModelSerializer):
         """Meta class for this serializer"""
         model = User
         fields = ['id','username','email','password','first_name','last_name',
-        'is_active','admin','date_joined','last_login']
+        'is_active','admin','avatar','date_joined','last_login']
 
 
 class TokenObtainPairSerializer(TokenObtainSerializer):

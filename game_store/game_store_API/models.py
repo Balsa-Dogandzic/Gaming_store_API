@@ -58,6 +58,7 @@ class User(AbstractUser):
     admin = models.BooleanField(default=False)
     balance = models.DecimalField(max_digits=6,decimal_places=2,default=1000,
         validators=[MaxValueValidator(1000),MinValueValidator(0)])
+    avatar = models.FileField(upload_to='avatars/',null=True)
     objects: MyUserManager()
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []

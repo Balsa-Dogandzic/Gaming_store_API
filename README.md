@@ -24,3 +24,4 @@ Rutiranje unutar API:
 - http://127.0.0.1:8000/api/specifications/(id od specifikacije)/ - vrace trazenu specifikaciju
 - http://127.0.0.1:8000/api/rating/ - GET i POST zahtjev. U POST zahtjevu se salju sledeci podaci user(id od user-a), product(id od product-a), rating(broj od 1 do 5), i comment.
 - http://127.0.0.1:8000/api/rating/(id od recenzije)/ - vrace specificno navedenu recenziju
+- http://127.0.0.1.:8000/api/profile/(id od korisnika)/ - PUT zahtjev kojem se salje avatar(slika), i koji postavlja avatar sliku za tog korisnika. PATCH zahtjev kojem se mogu poslati bilo koji podaci osim admin, i password.

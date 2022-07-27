@@ -17,10 +17,9 @@ class NotAdmin(APIException):
 
 class UserIsAdmin(permissions.BasePermission):
     """Custom admin permission class"""
-    allowed = ("GET","PUT","DELETE")
 
     def has_permission(self, request, view):
-        if request.user.is_authenticated and request.user.admin and request.method in self.allowed:
+        if request.user.is_authenticated and request.user.admin:
             return True
         raise NotAdmin()
 
@@ -32,9 +31,8 @@ class UserIsAdmin(permissions.BasePermission):
 
 class AdminUserOrReadOnly(permissions.BasePermission):
     """Custom admin or read only permission class"""
-    allowed = ("GET","POST")
     def has_permission(self, request, view):
         is_admin = request.user.is_authenticated and request.user.admin
-        if (is_admin and request.method in self.allowed) or request.method in SAFE_METHODS:
+        if is_admin or request.method in SAFE_METHODS:
             return True
         raise NotAdmin()
