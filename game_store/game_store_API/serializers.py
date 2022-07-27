@@ -4,7 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework import  serializers
 from game_store.settings import SIMPLE_JWT
-from .models import (Component,ComponentType,Manufacturer,Product,
+from .models import (Component,ComponentType,Manufacturer, Order,Product,
 ProductCategory,Specifications,User,Rating)
 # pylint: disable=too-few-public-methods
 
@@ -150,7 +150,7 @@ class SpecificationDetailSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class for this serializer"""
         model = Specifications
-        fields = ['id','component','quantity']
+        fields = ['id','component']
 
 class ProductRetrieveSerializer(serializers.HyperlinkedModelSerializer):
     """Product serializer for retrieve method in views"""
@@ -169,3 +169,19 @@ class RatingSerializer(serializers.ModelSerializer):
         """Meta class for ratings"""
     model = Rating
     fields = '__all__'
+
+class OrderSerializer(serializers.ModelSerializer):
+    """Order serializer"""
+    class Meta:
+        """Meta class for orders"""
+        model = Order
+        fields = '__all__'
+
+class OrderDetailSerializer(serializers.HyperlinkedModelSerializer):
+    """Order detail serializer"""
+    user = serializers.SlugRelatedField(read_only=True, slug_field='username')
+    product = ProductListSerializer(read_only=True)
+    class Meta:
+        """Meta class for orders"""
+        model = Order
+        fields = '__all__'

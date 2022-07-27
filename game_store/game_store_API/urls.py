@@ -2,7 +2,7 @@
 from django.urls import include, path
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework.routers import DefaultRouter
-from .views import (ApproveViewSet,CategoryView,ComponentTypeView,ComponentView,ManufacturerView,
+from .views import (ApproveViewSet,CategoryView,ComponentTypeView,ComponentView,ManufacturerView, OrderView,
 ProductView, ProfileView,RatingsView,RegisterView,SpecificationView,TokenObtainPairView)
 
 router = DefaultRouter()
@@ -15,6 +15,7 @@ router.register(r'product', ProductView, basename='product')
 router.register(r'specifications', SpecificationView, basename='specifications')
 router.register(r'rating', RatingsView, basename='rating')
 router.register(r'profile', ProfileView, basename='profile')
+router.register(r'order', OrderView, basename='order')
 
 
 urlpatterns = [

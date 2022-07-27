@@ -4,11 +4,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status, generics,viewsets,response,parsers,permissions
 from rest_framework_simplejwt.views import TokenViewBase
 from .serializers import (CategorySerializer,ComponentSerializer,ComponentTypeSerializer,
-DetailedComponentSerializers,ManufacturerSerializer,ProductListSerializer,ProductRetrieveSerializer,
+DetailedComponentSerializers,ManufacturerSerializer, OrderDetailSerializer,ProductListSerializer,ProductRetrieveSerializer,
 ProductSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,
-SpecificationSerializer,TokenObtainPairSerializer,UserSerializer)
+SpecificationSerializer,TokenObtainPairSerializer,UserSerializer,OrderSerializer)
 from .models import (Component,ComponentType,Manufacturer,Product, Rating,
-Specifications,User,ProductCategory)
+Specifications,User,ProductCategory, Order)
 from .permissions import AdminUserOrReadOnly, UserIsAdmin
 # pylint: disable=too-many-ancestors
 # pylint: disable=no-member
@@ -33,7 +33,8 @@ class RegisterView(generics.GenericAPIView):
 class ApproveViewSet(viewsets.ModelViewSet):
     """Class for inactive user approvement"""
     serializer_class = UserSerializer
-    # permission_classes = [UserIsAdmin,]
+    permission_classes = [UserIsAdmin,]
+    http_method_names = ['get','put','delete']
 
     def get_queryset(self):
         queryset = User.objects.filter(is_active=False).order_by('id')
@@ -285,8 +286,11 @@ class ProductView(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Product.objects.all().order_by('id')
         category = self.request.query_params.get('category')
+        manufacturer = self.request.query_params.get('manufacturer')
         if category is not None:
             queryset = queryset.filter(category__name = category)
+        if manufacturer is not None:
+            queryset = queryset.filter(manufacturer__name = manufacturer)
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -329,9 +333,10 @@ class SpecificationView(viewsets.ModelViewSet):
     """Spec view class"""
     serializer_class = SpecificationSerializer
     permission_classes = [AdminUserOrReadOnly]
+    http_method_names = ['get','post']
 
     def get_queryset(self):
-        return Specifications.objects.all().order_by('average_rating')
+        return Specifications.objects.all().order_by('id')
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -459,3 +464,43 @@ class ProfileView(viewsets.ModelViewSet):
                 "success": False,
                 "message": "Something went wrong.",
             },status = status.HTTP_400_BAD_REQUEST)
+
+class OrderView(viewsets.ModelViewSet):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get','post','delete']
+
+    def get_queryset(self):
+        user = self.request.user
+        return Order.objects.filter(user=user).order_by('id')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = OrderDetailSerializer(queryset, many=True,context={'request': request})
+        return response.Response({
+            "status":status.HTTP_200_OK,
+            "success": True,
+            "message":"Your orders.",
+            "data":serializer.data
+        })
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return response.Response({
+            "status": status.HTTP_201_CREATED,
+            "success": True,
+            "message": "Order Made Successfully.",
+            "data": serializer.data,
+        },status = status.HTTP_201_CREATED)
+
+    def destroy(self, request,*args,pk=None,**kwargs):
+        queryset = self.get_queryset()
+        user = get_object_or_404(queryset, pk=pk)
+        user.delete()
+        return response.Response({
+            "status": status.HTTP_202_ACCEPTED,
+            "success": True,
+            "message": "Order successfully deleted."
+        },status = status.HTTP_202_ACCEPTED)
