@@ -167,8 +167,17 @@ class RatingSerializer(serializers.ModelSerializer):
     """Rating serializer"""
     class Meta:
         """Meta class for ratings"""
-    model = Rating
-    fields = '__all__'
+        model = Rating
+        fields = ['id','user','product','rating','comment']
+
+class RatingDetailSerializer(serializers.ModelSerializer):
+    """Rating detail serializer"""
+    user = serializers.SlugRelatedField(read_only=True, slug_field='username')
+    product = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    class Meta:
+        "Meta class for rating details"
+        model = Rating
+        fields = ['id','user','product','rating','comment']
 
 class OrderSerializer(serializers.ModelSerializer):
     """Order serializer"""

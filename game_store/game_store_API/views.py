@@ -5,7 +5,7 @@ from rest_framework import status, generics,viewsets,response,parsers,permission
 from rest_framework_simplejwt.views import TokenViewBase
 from .serializers import (CategorySerializer,ComponentSerializer,ComponentTypeSerializer,
 DetailedComponentSerializers,ManufacturerSerializer, OrderDetailSerializer,ProductListSerializer,ProductRetrieveSerializer,
-ProductSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,
+ProductSerializer, RatingDetailSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,
 SpecificationSerializer,TokenObtainPairSerializer,UserSerializer,OrderSerializer)
 from .models import (Component,ComponentType,Manufacturer,Product, Rating,
 Specifications,User,ProductCategory, Order)
@@ -408,7 +408,7 @@ class RatingsView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = RatingSerializer(queryset,many=True)
+        serializer = RatingDetailSerializer(queryset,many=True)
         return response.Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -419,7 +419,7 @@ class RatingsView(viewsets.ModelViewSet):
     def retrieve(self, request, *args, pk=None,**kwargs):
         queryset = self.get_queryset()
         rating = get_object_or_404(queryset, pk=pk)
-        serializer = RatingSerializer(rating)
+        serializer = RatingDetailSerializer(rating)
         return response.Response({
             "status":status.HTTP_200_OK,
             "success":True,
@@ -428,7 +428,9 @@ class RatingsView(viewsets.ModelViewSet):
         },status = status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        request_data= dict(request.data)
+        request_data["user"] = self.request.user.pk
+        serializer = self.get_serializer(data = request_data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return response.Response({
@@ -508,13 +510,15 @@ class OrderView(viewsets.ModelViewSet):
         },status = status.HTTP_200_OK)
     
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        request_data= dict(request.data)
+        request_data["user"] = self.request.user.pk
+        serializer = self.get_serializer(data = request_data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return response.Response({
             "status": status.HTTP_201_CREATED,
             "success": True,
-            "message": "Order Made Successfully.",
+            "message": "Rating Created Successfully.",
             "data": serializer.data,
         },status = status.HTTP_201_CREATED)
 

@@ -21,9 +21,9 @@ Rutiranje unutar API:
 - http://127.0.0.1:8000/api/product/ - GET i POST zahtjevi. POST zahtjev kao podatke prihvata name,description,image,price,manufacturer(id od proizvodjaca),category(id od kategorije), takodje samo admin ima pravo na POST request.
 - http://127.0.0.1:8000/api/product/(id od proizvoda)/ - GET, PUT i DELETE zahtjev. GET vrace podatke o jednom proizvodu sa njegovim specifikacijama, PUT mijenja bilo koji podatak koji mu se proslijedi. A DELETE brise trazeni proizvod.
 - http://127.0.0.1:8000/api/specifications/ - GET i POST zahtjev. Na POST-u se salju sledeci podaci product(id od proizvoda), component(id od komponente) i quantity koji ako se ne unese po defaultu je 1. Samo admin korisnik moze da dodaje specifikacije.
-- http://127.0.0.1:8000/api/specifications/(id od specifikacije)/ - vrace trazenu specifikaciju
-- http://127.0.0.1:8000/api/rating/ - GET i POST zahtjev. U POST zahtjevu se salju sledeci podaci user(id od user-a), product(id od product-a), rating(broj od 1 do 5), i comment.
-- http://127.0.0.1:8000/api/rating/(id od recenzije)/ - vrace specificno navedenu recenziju
+- http://127.0.0.1:8000/api/specifications/(id od specifikacije)/ - vrace trazenu specifikaciju.
+- http://127.0.0.1:8000/api/rating/ - GET i POST zahtjev. U POST zahtjevu se salju sledeci podaci product(id od product-a), rating(broj od 1 do 5), i comment.  User id se dobija preko tokena.
+- http://127.0.0.1:8000/api/rating/(id od recenzije)/ - vrace specificno navedenu recenziju.
 - http://127.0.0.1.:8000/api/profile/(id od korisnika)/ - PUT zahtjev kojem se salje avatar(slika), i koji postavlja avatar sliku za tog korisnika. PATCH zahtjev kojem se mogu poslati bilo koji podaci osim admin, i password.
-- http://127.0.0.1.:8000/api/order/ - GET i POST zahtjev. GET vrace sve order-e od trenutno ulogovanog user-a. POST zahtjeva sledece podatke user(id od user-a), product(id od proizvoda) i quantity. Korisnik mora biti ulogovan za ove zahtjeve
+- http://127.0.0.1.:8000/api/order/ - GET i POST zahtjev. GET vrace sve order-e od trenutno ulogovanog user-a. POST zahtjeva sledece podatke product(id od proizvoda) i quantity. User id se dobija preko tokena. Korisnik mora biti ulogovan za ove zahtjeve.
 - http://127.0.0.1.:8000/api/order/(id od order-a)/ - DELETE zahtjev brise zahtjevan order. Kada korisnik klikne na "buy" dugme svi orderi trebaju biti obrisani, a balance na korisniku treba biti promijenjen.
