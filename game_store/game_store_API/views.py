@@ -411,6 +411,7 @@ class RatingsView(viewsets.ModelViewSet):
         },status = status.HTTP_201_CREATED)
         
 class ProfileView(viewsets.ModelViewSet):
+    """View for updating profile info"""
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (parsers.MultiPartParser,parsers.FormParser)

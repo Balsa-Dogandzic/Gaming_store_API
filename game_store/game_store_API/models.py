@@ -1,4 +1,5 @@
 """Make your models here"""
+from itertools import product
 from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractUser
@@ -125,8 +126,6 @@ class Specifications(models.Model):
     """Specifications model"""
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='specs')
     component = models.ForeignKey(Component,on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1,
-        validators=[MaxValueValidator(10),MinValueValidator(1)])
     class Meta:
         """Unique together validator"""
         unique_together = ('product','component')
@@ -141,3 +140,9 @@ class Rating(models.Model):
     class Meta:
         """Unique together validator"""
         unique_together = ('user','product')
+
+class Order(models.Model):
+    """Order class"""
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='orders')
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='order')
+    quantity = models.IntegerField(validators=[MaxValueValidator(10),MinValueValidator(1)])
