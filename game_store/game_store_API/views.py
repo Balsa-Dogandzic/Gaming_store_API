@@ -1,5 +1,6 @@
 """Create your views here"""
 from django.forms import ValidationError
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics,viewsets,response,parsers,permissions
 from rest_framework_simplejwt.views import TokenViewBase
@@ -284,7 +285,8 @@ class ProductView(viewsets.ModelViewSet):
     http_method_names = ['get','post','put','delete']
 
     def get_queryset(self):
-        queryset = Product.objects.all().order_by('id')
+        queryset = Product.objects.all().annotate(
+        average_rating=(Avg('ratings__rating'))).order_by('-average_rating')
         category = self.request.query_params.get('category')
         manufacturer = self.request.query_params.get('manufacturer')
         if category is not None:
