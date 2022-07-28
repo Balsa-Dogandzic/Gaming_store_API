@@ -34,6 +34,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         'last_name','balance','is_active','admin','avatar',
         'date_joined','last_login']
 
+class UpdateProfile(serializers.HyperlinkedModelSerializer):
+    """Hyperlinked user serializer"""
+    class Meta:
+        """Meta class for this serializer"""
+        model = User
+        fields = ['id','url','username','email','first_name',
+        'last_name','balance','is_active','avatar']
 
 class LoginSerializer(serializers.ModelSerializer):
     """User serializer for login response"""
@@ -168,7 +175,7 @@ class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class for ratings"""
         model = Rating
-        fields = ['id','user','product','rating','comment']
+        fields = ['id','user','product','rating','comment','created_at']
 
 class RatingDetailSerializer(serializers.ModelSerializer):
     """Rating detail serializer"""
@@ -177,14 +184,14 @@ class RatingDetailSerializer(serializers.ModelSerializer):
     class Meta:
         "Meta class for rating details"
         model = Rating
-        fields = ['id','user','product','rating','comment']
+        fields = ['id','user','product','rating','comment','created_at']
 
 class OrderSerializer(serializers.ModelSerializer):
     """Order serializer"""
     class Meta:
         """Meta class for orders"""
         model = Order
-        fields = '__all__'
+        fields = ['id','user','product','quantity','total']
 
 class OrderDetailSerializer(serializers.HyperlinkedModelSerializer):
     """Order detail serializer"""
@@ -193,4 +200,4 @@ class OrderDetailSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         """Meta class for orders"""
         model = Order
-        fields = '__all__'
+        fields = ['id','user','product','quantity','total']

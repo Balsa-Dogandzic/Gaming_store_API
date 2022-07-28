@@ -145,3 +145,6 @@ class Order(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='orders')
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='order')
     quantity = models.IntegerField(validators=[MaxValueValidator(10),MinValueValidator(1)])
+
+    def total(self):
+        return self.product.price * self.quantity 

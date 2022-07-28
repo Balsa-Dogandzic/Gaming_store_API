@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import TokenViewBase
 from .serializers import (CategorySerializer,ComponentSerializer,ComponentTypeSerializer,
 DetailedComponentSerializers,ManufacturerSerializer, OrderDetailSerializer,ProductListSerializer,ProductRetrieveSerializer,
 ProductSerializer, RatingDetailSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,
-SpecificationSerializer,TokenObtainPairSerializer,UserSerializer,OrderSerializer)
+SpecificationSerializer,TokenObtainPairSerializer, UpdateProfile,UserSerializer,OrderSerializer)
 from .models import (Component,ComponentType,Manufacturer,Product, Rating,
 Specifications,User,ProductCategory, Order)
 from .permissions import AdminUserOrReadOnly, UserIsAdmin
@@ -474,9 +474,8 @@ class ProfileView(viewsets.ModelViewSet):
     def partial_update(self, request, *args, pk=None, **kwargs):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, pk=pk)
-        serializer = UserSerializer(user, data=request.data, partial=True,context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        if serializer.data.get('password') is None and serializer.data.get('admin') is None:
+        serializer = UpdateProfile(user,data=request.data,partial=True,context={'request': request})
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return response.Response({
                 "status":status.HTTP_201_CREATED,
@@ -531,3 +530,44 @@ class OrderView(viewsets.ModelViewSet):
             "success": True,
             "message": "Order successfully deleted."
         },status = status.HTTP_202_ACCEPTED)
+
+class PaymentView(viewsets.ModelViewSet):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['put']
+    def get_queryset(self):
+        queryset = User.objects.filter().order_by('id')
+        return queryset
+    def update(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        user = get_object_or_404(queryset,pk=request.user.pk)
+        serializer = UserSerializer(user, context={'request': request})
+        data = request.data
+        try:
+            if float(user.balance) >= float(data['balance']) and float(data['balance']) >= 0:
+                user.balance = data["balance"]
+                user.save()
+                return response.Response({
+                    "status": status.HTTP_201_CREATED,
+                    "success": True,
+                    "message": "Payment successfull.",
+                    "data": serializer.data
+                },status = status.HTTP_201_CREATED)
+            else:
+                return response.Response({
+                    "status": status.HTTP_403_FORBIDDEN,
+                    "success": False,
+                    "message": "You can't give yourself money, or go in debt."
+                },status = status.HTTP_403_FORBIDDEN)
+        except KeyError:
+            return response.Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "Something went wrong.",
+            },status = status.HTTP_400_BAD_REQUEST)
+        except ValidationError:
+            return response.Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "Something went wrong.",
+            },status = status.HTTP_400_BAD_REQUEST)
