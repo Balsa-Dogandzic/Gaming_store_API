@@ -34,13 +34,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         'last_name','balance','is_active','admin','avatar',
         'date_joined','last_login']
 
-class UpdateProfile(serializers.HyperlinkedModelSerializer):
-    """Hyperlinked user serializer"""
+class UpdateProfile(serializers.ModelSerializer):
+    """Hyperlinked serializer for user updates"""
     class Meta:
         """Meta class for this serializer"""
         model = User
-        fields = ['id','url','username','email','first_name',
-        'last_name','balance','is_active','avatar']
+        fields = ['id','username','email','first_name',
+        'last_name','is_active']
 
 class LoginSerializer(serializers.ModelSerializer):
     """User serializer for login response"""

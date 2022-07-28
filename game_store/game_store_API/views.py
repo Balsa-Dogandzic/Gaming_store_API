@@ -365,7 +365,7 @@ class SpecificationView(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = SpecificationSerializer(queryset, many=True)
+        serializer = SpecificationDetailSerializer(queryset, many=True)
         return response.Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -450,7 +450,7 @@ class ProfileView(viewsets.ModelViewSet):
     http_method_names = ['put','patch']
 
     def get_queryset(self):
-        return User.objects.all().order_by('id')
+        return User.objects.filter(pk = self.request.user.pk)
 
     def update(self, request, *args, pk=None, **kwargs):
         queryset = self.get_queryset()
@@ -476,7 +476,7 @@ class ProfileView(viewsets.ModelViewSet):
     def partial_update(self, request, *args, pk=None, **kwargs):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, pk=pk)
-        serializer = UpdateProfile(user,data=request.data,partial=True,context={'request': request})
+        serializer = UpdateProfile(user,data=request.data,partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return response.Response({
@@ -534,15 +534,13 @@ class OrderView(viewsets.ModelViewSet):
         },status = status.HTTP_202_ACCEPTED)
 
 class PaymentView(viewsets.ModelViewSet):
-    serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['put']
     def get_queryset(self):
-        queryset = User.objects.filter().order_by('id')
-        return queryset
-    def update(self, request, *args, **kwargs):
+        return User.objects.filter(pk = self.request.user.pk)
+    def update(self, request, *args, pk = None, **kwargs):
         queryset = self.get_queryset()
-        user = get_object_or_404(queryset,pk=request.user.pk)
+        user = get_object_or_404(queryset,pk=pk)
         serializer = UserSerializer(user, context={'request': request})
         data = request.data
         try:
