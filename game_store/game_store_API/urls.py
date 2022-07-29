@@ -2,8 +2,10 @@
 from django.urls import include, path
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework.routers import DefaultRouter
-from .views import (ApproveViewSet,CategoryView,ComponentTypeView,ComponentView,ManufacturerView, OrderView, PaymentView,
-ProductView, ProfileView,RatingsView,RegisterView,SpecificationView,TokenObtainPairView)
+from .views import (ApproveViewSet,CategoryView,ComponentTypeView,ComponentView,
+ManufacturerView, OrderView, PaymentView,
+ProductView, ProfileView,RatingsView,RegisterView,
+SpecificationView,TokenObtainPairView)
 
 router = DefaultRouter()
 router.register(r'inactive', ApproveViewSet, basename='user')

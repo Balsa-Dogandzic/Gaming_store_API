@@ -1,5 +1,4 @@
 """Make your models here"""
-from itertools import product
 from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractUser
@@ -147,4 +146,5 @@ class Order(models.Model):
     quantity = models.IntegerField(validators=[MaxValueValidator(10),MinValueValidator(1)])
 
     def total(self):
-        return self.product.price * self.quantity 
+        """Returns the total cost of the order"""
+        return self.product.price * self.quantity

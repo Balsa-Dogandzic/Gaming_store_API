@@ -5,8 +5,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status, generics,viewsets,response,parsers,permissions
 from rest_framework_simplejwt.views import TokenViewBase
 from .serializers import (CategorySerializer,ComponentSerializer,ComponentTypeSerializer,
-DetailedComponentSerializers,ManufacturerSerializer, OrderDetailSerializer,ProductListSerializer,ProductRetrieveSerializer,
-ProductSerializer, RatingDetailSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,
+DetailedComponentSerializers,ManufacturerSerializer, OrderDetailSerializer,
+ProductListSerializer,ProductRetrieveSerializer,ProductSerializer,
+RatingDetailSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,
 SpecificationSerializer,TokenObtainPairSerializer, UpdateProfile,UserSerializer,OrderSerializer)
 from .models import (Component,ComponentType,Manufacturer,Product, Rating,
 Specifications,User,ProductCategory, Order)
@@ -333,7 +334,8 @@ class ProductView(viewsets.ModelViewSet):
     def update(self, request, *args, pk = None,**kwargs):
         queryset = self.get_queryset()
         product = get_object_or_404(queryset,pk=pk)
-        serializer = ProductListSerializer(product, data=request.data, partial=True,context={'request': request})
+        serializer = ProductListSerializer(product,data=request.data,
+        partial=True,context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return response.Response({
@@ -441,7 +443,7 @@ class RatingsView(viewsets.ModelViewSet):
             "message": "Rating Created Successfully.",
             "data": serializer.data,
         },status = status.HTTP_201_CREATED)
-        
+
 class ProfileView(viewsets.ModelViewSet):
     """View for updating profile info"""
     serializer_class = UserSerializer
@@ -472,7 +474,7 @@ class ProfileView(viewsets.ModelViewSet):
                 "success": False,
                 "message": "Something went wrong.",
             },status = status.HTTP_400_BAD_REQUEST)
-    
+
     def partial_update(self, request, *args, pk=None, **kwargs):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, pk=pk)
@@ -492,6 +494,7 @@ class ProfileView(viewsets.ModelViewSet):
             },status = status.HTTP_400_BAD_REQUEST)
 
 class OrderView(viewsets.ModelViewSet):
+    """Order view class"""
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['get','post','delete']
@@ -509,7 +512,7 @@ class OrderView(viewsets.ModelViewSet):
             "message":"Your orders.",
             "data":serializer.data
         },status = status.HTTP_200_OK)
-    
+
     def create(self, request, *args, **kwargs):
         request_data= dict(request.data)
         request_data["user"] = self.request.user.pk
@@ -534,6 +537,7 @@ class OrderView(viewsets.ModelViewSet):
         },status = status.HTTP_202_ACCEPTED)
 
 class PaymentView(viewsets.ModelViewSet):
+    """View class for payments"""
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['put']
     def get_queryset(self):
@@ -553,12 +557,11 @@ class PaymentView(viewsets.ModelViewSet):
                     "message": "Payment successfull.",
                     "data": serializer.data
                 },status = status.HTTP_201_CREATED)
-            else:
-                return response.Response({
-                    "status": status.HTTP_403_FORBIDDEN,
-                    "success": False,
-                    "message": "You can't give yourself money, or go in debt."
-                },status = status.HTTP_403_FORBIDDEN)
+            return response.Response({
+                "status": status.HTTP_403_FORBIDDEN,
+                "success": False,
+                "message": "You can't give yourself money, or go in debt."
+            },status = status.HTTP_403_FORBIDDEN)
         except KeyError:
             return response.Response({
                 "status": status.HTTP_400_BAD_REQUEST,
