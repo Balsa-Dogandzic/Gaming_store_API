@@ -8,6 +8,7 @@ from .models import (Component,ComponentType,Manufacturer, Order,Product,
 ProductCategory,Specifications,User,Rating)
 # pylint: disable=too-few-public-methods
 
+# Auth serializers
 
 class RegisterSerializer(serializers.ModelSerializer):
     """Serializer for user registration"""
@@ -34,8 +35,26 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         'last_name','balance','is_active','admin','avatar',
         'date_joined','last_login']
 
+class ApproveUserSerializer(serializers.HyperlinkedModelSerializer):
+    """Hyperlinked user serializer"""
+    class Meta:
+        """Meta class for this serializer"""
+        model = User
+        fields = ['id','url','username','email','password','first_name',
+        'last_name','balance','is_active','admin','avatar',
+        'date_joined','last_login']
+
+class ProfileSerializer(serializers.ModelSerializer):
+    """Profile info serializer"""
+    class Meta:
+        """Meta class for this serializer"""
+        model = User
+        fields = ['id','username','email','password','first_name',
+        'last_name','balance','is_active','admin','avatar',
+        'date_joined','last_login']
+
 class UpdateProfile(serializers.ModelSerializer):
-    """Hyperlinked serializer for user updates"""
+    """Serializer for user updates"""
     class Meta:
         """Meta class for this serializer"""
         model = User
@@ -49,7 +68,6 @@ class LoginSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id','username','email','password','first_name','last_name',
         'balance','is_active','admin','avatar','date_joined','last_login']
-
 
 class TokenObtainPairSerializer(TokenObtainSerializer):
     """Overwritten jwt login serializer"""
@@ -83,13 +101,14 @@ class TokenObtainPairSerializer(TokenObtainSerializer):
     def update(self, instance, validated_data):
         return
 
+# Model serializers
+
 class CategorySerializer(serializers.ModelSerializer):
     """Category serializer"""
     class Meta:
         """Meta class for this serializer"""
         model = ProductCategory
         fields = '__all__'
-
 
 class ManufacturerSerializer(serializers.ModelSerializer):
     """Manufacturer serializer"""
@@ -98,14 +117,12 @@ class ManufacturerSerializer(serializers.ModelSerializer):
         model = Manufacturer
         fields = '__all__'
 
-
 class ComponentTypeSerializer(serializers.ModelSerializer):
     """Component type serializer"""
     class Meta:
         """Meta class for this serializer"""
         model = ComponentType
         fields = '__all__'
-
 
 class ComponentSerializer(serializers.ModelSerializer):
     """Component serializer"""
@@ -123,14 +140,12 @@ class DetailedComponentSerializers(serializers.ModelSerializer):
         model = Component
         fields = ['id','name','type','manufacturer']
 
-
 class ProductSerializer(serializers.ModelSerializer):
     """Product serializer"""
     class Meta:
         """Meta class for this serializer"""
         model = Product
         fields = '__all__'
-
 
 class ProductListSerializer(serializers.HyperlinkedModelSerializer):
     """Product serializer for list method in views"""
@@ -142,14 +157,12 @@ class ProductListSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id','name','url','category','manufacturer','image',
             'description','price','average_rating']
 
-
 class SpecificationSerializer(serializers.ModelSerializer):
     """Specs serializer"""
     class Meta:
         """Meta class for this serializer"""
         model = Specifications
         fields = '__all__'
-
 
 class SpecificationDetailSerializer(serializers.ModelSerializer):
     """Specs serializer to display components"""
@@ -170,6 +183,8 @@ class ProductRetrieveSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id','name','url','category','manufacturer','image','description',
             'price','average_rating','specs']
 
+# Ratings
+
 class RatingSerializer(serializers.ModelSerializer):
     """Rating serializer"""
     class Meta:
@@ -185,6 +200,8 @@ class RatingDetailSerializer(serializers.ModelSerializer):
         "Meta class for rating details"
         model = Rating
         fields = ['id','user','product','rating','comment','created_at']
+
+# Orders
 
 class OrderSerializer(serializers.ModelSerializer):
     """Order serializer"""

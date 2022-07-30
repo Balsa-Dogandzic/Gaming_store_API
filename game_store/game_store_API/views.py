@@ -4,17 +4,19 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics,viewsets,response,parsers,permissions
 from rest_framework_simplejwt.views import TokenViewBase
-from .serializers import (CategorySerializer,ComponentSerializer,ComponentTypeSerializer,
-DetailedComponentSerializers,ManufacturerSerializer, OrderDetailSerializer,
-ProductListSerializer,ProductRetrieveSerializer,ProductSerializer,
+from .serializers import (ApproveUserSerializer, CategorySerializer,ComponentSerializer,
+ComponentTypeSerializer,DetailedComponentSerializers,ManufacturerSerializer, OrderDetailSerializer,
+ProductListSerializer,ProductRetrieveSerializer,ProductSerializer, ProfileSerializer,
 RatingDetailSerializer, RatingSerializer,RegisterSerializer,SpecificationDetailSerializer,
-SpecificationSerializer,TokenObtainPairSerializer, UpdateProfile,UserSerializer,OrderSerializer)
+SpecificationSerializer,TokenObtainPairSerializer,
+UpdateProfile,UserSerializer,OrderSerializer)
 from .models import (Component,ComponentType,Manufacturer,Product, Rating,
 Specifications,User,ProductCategory, Order)
 from .permissions import AdminUserOrReadOnly, UserIsAdmin
 # pylint: disable=too-many-ancestors
 # pylint: disable=no-member
 
+# User related views
 
 class RegisterView(generics.GenericAPIView):
     """Class for user registration"""
@@ -31,10 +33,9 @@ class RegisterView(generics.GenericAPIView):
             "data": UserSerializer(user, context=self.get_serializer_context()).data,
         },status = status.HTTP_201_CREATED)
 
-
 class ApproveViewSet(viewsets.ModelViewSet):
     """Class for inactive user approvement"""
-    serializer_class = UserSerializer
+    serializer_class = ApproveUserSerializer
     permission_classes = [UserIsAdmin,]
     http_method_names = ['get','put','delete']
 
@@ -44,7 +45,7 @@ class ApproveViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = UserSerializer(queryset, many=True,context={'request': request})
+        serializer = ApproveUserSerializer(queryset, many=True,context={'request': request})
         return response.Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -55,7 +56,7 @@ class ApproveViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, pk=None,**kwargs):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, pk=pk)
-        serializer = UserSerializer(user, context={'request': request})
+        serializer = ApproveUserSerializer(user, context={'request': request})
         return response.Response({
                 "status": status.HTTP_200_OK,
                 "success": True,
@@ -66,7 +67,7 @@ class ApproveViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, pk = None,**kwargs):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset,pk=pk)
-        serializer = UserSerializer(user, context={'request': request})
+        serializer = ApproveUserSerializer(user, context={'request': request})
         data = request.data
         try:
             user.is_active = data["is_active"]
@@ -100,11 +101,81 @@ class ApproveViewSet(viewsets.ModelViewSet):
             "message": "User successfully deleted."
         },status = status.HTTP_202_ACCEPTED)
 
-
 class TokenObtainPairView(TokenViewBase):
     """Class for user login"""
     serializer_class = TokenObtainPairSerializer
 
+class ProfileView(viewsets.ModelViewSet):
+    """View for updating profile info"""
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (parsers.MultiPartParser,parsers.FormParser)
+    http_method_names = ['get','put','patch']
+
+    def get_queryset(self):
+        return User.objects.filter(pk = self.request.user.pk)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = ProfileSerializer(queryset,many=True)
+        return response.Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "User profile",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, pk=None,**kwargs):
+        queryset = self.get_queryset()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = ProfileSerializer(user)
+        return response.Response({
+                "status": status.HTTP_200_OK,
+                "success": True,
+                "message": "Requested user data",
+                "data": serializer.data
+            },status = status.HTTP_200_OK)
+
+    def update(self, request, *args, pk=None, **kwargs):
+        queryset = self.get_queryset()
+        user = get_object_or_404(queryset,pk=pk)
+        serializer = ProfileSerializer(user)
+        data = request.data
+        try:
+            user.avatar = data["avatar"]
+            user.save()
+            return response.Response({
+                "status": status.HTTP_201_CREATED,
+                "success": True,
+                "message": "Image successfully uploaded.",
+                "data": serializer.data
+            },status = status.HTTP_201_CREATED)
+        except KeyError:
+            return response.Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "Something went wrong.",
+            },status = status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, *args, pk=None, **kwargs):
+        queryset = self.get_queryset()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = UpdateProfile(user,data=request.data,partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return response.Response({
+                "status":status.HTTP_201_CREATED,
+                "success": True,
+                "message":"Successfully updated",
+                "data":serializer.data
+                },status = status.HTTP_201_CREATED)
+        return response.Response({
+                "status": status.HTTP_400_BAD_REQUEST,
+                "success": False,
+                "message": "Something went wrong.",
+            },status = status.HTTP_400_BAD_REQUEST)
+
+# Model related views
 
 class CategoryView(viewsets.ModelViewSet):
     """Category view class"""
@@ -151,7 +222,6 @@ class CategoryView(viewsets.ModelViewSet):
             "data": serializer.data,
         },status = status.HTTP_201_CREATED)
 
-
 class ManufacturerView(viewsets.ModelViewSet):
     """Manufacturer view class"""
     serializer_class = ManufacturerSerializer
@@ -192,7 +262,6 @@ class ManufacturerView(viewsets.ModelViewSet):
             "message": "Manufacturer Created Successfully.",
             "data": serializer.data
         },status = status.HTTP_201_CREATED)
-
 
 class ComponentTypeView(viewsets.ModelViewSet):
     """Component type view class"""
@@ -235,7 +304,6 @@ class ComponentTypeView(viewsets.ModelViewSet):
             "data": serializer.data
         },status = status.HTTP_201_CREATED)
 
-
 class ComponentView(viewsets.ModelViewSet):
     """Component view class"""
     serializer_class = ComponentSerializer
@@ -276,7 +344,6 @@ class ComponentView(viewsets.ModelViewSet):
             "message": "Component type Created Successfully.",
             "data": serializer.data
         },status = status.HTTP_201_CREATED)
-
 
 class ProductView(viewsets.ModelViewSet):
     """Product view class"""
@@ -354,7 +421,6 @@ class ProductView(viewsets.ModelViewSet):
             "success": True,
             "message": "Product successfully deleted."
         },status = status.HTTP_202_ACCEPTED)
-
 
 class SpecificationView(viewsets.ModelViewSet):
     """Spec view class"""
@@ -443,55 +509,6 @@ class RatingsView(viewsets.ModelViewSet):
             "message": "Rating Created Successfully.",
             "data": serializer.data,
         },status = status.HTTP_201_CREATED)
-
-class ProfileView(viewsets.ModelViewSet):
-    """View for updating profile info"""
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    parser_classes = (parsers.MultiPartParser,parsers.FormParser)
-    http_method_names = ['put','patch']
-
-    def get_queryset(self):
-        return User.objects.filter(pk = self.request.user.pk)
-
-    def update(self, request, *args, pk=None, **kwargs):
-        queryset = self.get_queryset()
-        user = get_object_or_404(queryset,pk=pk)
-        serializer = UserSerializer(user, context={'request': request})
-        data = request.data
-        try:
-            user.avatar = data["avatar"]
-            user.save()
-            return response.Response({
-                "status": status.HTTP_201_CREATED,
-                "success": True,
-                "message": "Image successfully uploaded.",
-                "data": serializer.data
-            },status = status.HTTP_201_CREATED)
-        except KeyError:
-            return response.Response({
-                "status": status.HTTP_400_BAD_REQUEST,
-                "success": False,
-                "message": "Something went wrong.",
-            },status = status.HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request, *args, pk=None, **kwargs):
-        queryset = self.get_queryset()
-        user = get_object_or_404(queryset, pk=pk)
-        serializer = UpdateProfile(user,data=request.data,partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return response.Response({
-                "status":status.HTTP_201_CREATED,
-                "success": True,
-                "message":"Successfully updated",
-                "data":serializer.data
-                },status = status.HTTP_201_CREATED)
-        return response.Response({
-                "status": status.HTTP_400_BAD_REQUEST,
-                "success": False,
-                "message": "Something went wrong.",
-            },status = status.HTTP_400_BAD_REQUEST)
 
 class OrderView(viewsets.ModelViewSet):
     """Order view class"""
