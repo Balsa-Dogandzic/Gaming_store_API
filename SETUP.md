@@ -1,27 +1,27 @@
-Da bi API funkcionisao potrebno je instalirati virtuelno okruzenje. On se instalira na nacin da se u Gaming_store_API direktorijumu pokrene sledeca komanda:
+These instructions are for the ubuntu 20.04 operating system.
+
+Install the virtual environment:
 
 `python3 -m venv env`
 
-U tom folderu bi se sada trebao nalaziti folder pod imenom "env", zatim trebate da aktivirate virtualno okruzenje sledecom komandom:
+Activate the virtual environment:
 
-Na linux-u: `source env/bin/activate`
+`source env/bin/activate`
 
-Na windows-u: `env\Scripts\activate`
-
-Instalirajte requirements.txt:
+Install requirements.txt:
 
 `pip install -r requirements.txt`
 
-Napravite, pa izvrsite migracije pomocu manage.py(fajl manage.py se nalazi u game_store direktorijumu):
+Make migrations and migrate with the following commands(manage.py is in the game_store directory):
 
 `python manage.py makemigrations`
 
 `python manage.py migrate`
 
-Ubacite podatke iz dump.json fajla u bazu podataka pomocu komande:
+Load fixtures:
 
-`python game_store/manage.py loaddata dump.json`
+`python manage.py loaddata ../dump.json`
 
-Pokrenite server:
+Run the server:
 
 `python manage.py runserver`
